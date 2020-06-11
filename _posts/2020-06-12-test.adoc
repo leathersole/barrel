@@ -1,0 +1,11 @@
+---
+#permalink: /:posts/
+author: Takayuki Konishi
+layout: single
+header:
+  overlay_image: /assets/images/title.jpg
+---
+= test01
+
+== test02
+test03

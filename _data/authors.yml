@@ -1,0 +1,17 @@
+# Site Author
+Takayuki Konishi:
+  name             : "Takayuki Konishi"
+  bio              : "Technical support engineer, sean-nos dancer"
+  avatar: "/assets/images/photo.jpg"
+  location         : "Japan"
+  links:
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      # url: "https://your-website.com"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/leather_sole"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/leathersole"
+

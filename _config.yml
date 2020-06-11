@@ -13,21 +13,68 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Your awesome title
-email: your-email@example.com
+title: tkonishi_notes
+title_separator: "|"
+#subtitle: "Version 2.0"
+name: "Takayuki Konishi"
+email: seannos.takayuki+pages@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog
+  Notes about software and hardware
+baseurl: "/barrel" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+#repository: "http://192.168.17.5:18080/jekylltest"
+twitter:
+  username: "leather_sole"
+search: true
+
+# Outputting
+permalink: /:categories/:title/
+# paginate: 5
+# paginate_path: /recent/page:num/
+timezone: Asia/Tokyo
+
+compress_html:
+  clippings: all
+  ignore:
+    envs: development  # disable compression in dev environment
+
+# Reading Files
+include:
+  - .htaccess
+  - _pages
+exclude:
+  - "*.sublime-project"
+  - "*.sublime-workspace"
+  - vendor
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - assets/js/plugins
+  - assets/js/_main.js
+  - assets/js/vendor
+  - CHANGELOG
+  - config
+  - Gruntfile.js
+  - gulpfile.js
+  - LICENSE
+  - log
+  - node_modules
+  - package.json
+  - Rakefile
+  - README
+  - tmp
+  - /test # ignore Minimal Mistakes /test
+  - LICENSE.adoc
+  - README.adoc
+  - Gemfile
+  - Gemfile.lock
 
 # Build settings
 markdown: kramdown
-theme: minima
+
 plugins:
+  - jekyll-asciidoc
   - jekyll-feed
 
 # Exclude from processing.
@@ -41,3 +88,48 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+# AsciiDoc
+require: asciidoctor-html5s
+asciidoc: {}
+asciidoctor:
+  backend: html5s
+
+# Theme
+#theme: minima
+# minimal-mistakes
+theme: minimal-mistakes-jekyll
+minimal_mistakes_skin: "air" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      read_time: false
+      comments: false
+      share: false
+      related: false
+      author_profile: true
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      read_time: false
+      comments: false
+      share: false
+      related: false
+      author_profile: true
+
+# Site Footer
+footer:
+  links:
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/leather_sole"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: https://github.com/leathersole
