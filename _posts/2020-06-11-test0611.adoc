@@ -4,6 +4,8 @@ author: Takayuki Konishi
 layout: single
 header:
   overlay_image: /assets/images/title.jpg
+categories: product english
+tags: baz hoge
 ---
 = test01
 
