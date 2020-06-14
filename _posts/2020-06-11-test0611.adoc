@@ -1,10 +1,10 @@
 ---
-#permalink: /:posts/
+permalink: /:categories/:title/
 author: Takayuki Konishi
 layout: single
 header:
   overlay_image: /assets/images/title.jpg
-categories: product english
+categories: blog en
 tags: baz hoge
 ---
 = test01
