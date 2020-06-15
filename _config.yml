@@ -28,6 +28,17 @@ twitter:
 search: true
 breadcrumbs: true
 
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  blanklines: true
+  profile: false
+  startings: []
+  ignore:
+    envs: development  # disable compression in dev environment
+
+
 category_archive:
   type: liquid
   path: /categories/
