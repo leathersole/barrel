@@ -34,6 +34,7 @@
           </svg>
         </button>
         {% endif %}
+        {% include lang-nav.html %}
         <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">{{ site.data.ui-text[site.locale].menu_label | default: "Toggle menu" }}</span>
           <div class="navicon"></div>

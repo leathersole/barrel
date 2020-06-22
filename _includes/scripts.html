@@ -27,3 +27,9 @@
     <script src="{{ script | relative_url }}"></script>
   {% endfor %}
 {% endif %}
+
+{% if page.lang %}
+<script>
+  twemoji.parse(document.getElementById("langage-selector"));
+</script>
+{% endif %}
