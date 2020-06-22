@@ -1,0 +1,14 @@
+{% if page.ref %}
+<div class="lang" id="langage-selector">
+        {% assign posts=site.posts | where:"ref", page.ref | sort: 'lang' %}
+        {% for post in posts %}
+        {% assign lang=site.data.languages[post.lang] %}
+        <a hreflang="{{ post.lang }}" href="{{ post.url }}" class="{{ post.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
+        {% endfor %}
+        {% assign pages=site.pages | where:"ref", page.ref | sort: 'lang' %}
+        {% for page in pages %}
+        {% assign lang=site.data.languages[page.lang] %}
+        <a hreflang="{{ post.lang }}"  href="{{ page.url }}" class="{{ page.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
+        {% endfor %}
+</div>
+{% endif %}
