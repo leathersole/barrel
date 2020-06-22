@@ -3,12 +3,22 @@
         {% assign posts=site.posts | where:"ref", page.ref | sort: 'lang' %}
         {% for post in posts %}
         {% assign lang=site.data.languages[post.lang] %}
-        <a hreflang="{{ post.lang }}" href="{{ post.url }}" class="{{ post.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
+        {% if site.baseurl == blank %}
+          {% assign url = post.url %}
+        {% else %}
+          {% assign url = site.baseurl | append: post.url %}
+        {% endif %}
+        <a hreflang="{{ post.lang }}" href="{{ url }}" class="{{ post.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
         {% endfor %}
         {% assign pages=site.pages | where:"ref", page.ref | sort: 'lang' %}
         {% for page in pages %}
         {% assign lang=site.data.languages[page.lang] %}
-        <a hreflang="{{ post.lang }}"  href="{{ page.url }}" class="{{ page.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
+        {% if site.baseurl == blank %}
+          {% assign url = page.url %}
+        {% else %}
+          {% assign url = site.baseurl | append: page.url %}
+        {% endif %}
+        <a hreflang="{{ page.lang }}"  href="{{ url }}" class="{{ page.lang }}" title="{{ lang.title }}">{{ lang.icon }}</a>
         {% endfor %}
 </div>
 {% endif %}
