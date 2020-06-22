@@ -1,11 +1,13 @@
 ---
-permalink: /:categories/:title/
+#permalink: /:categories/:title/
 author: Takayuki Konishi
 layout: single
 header:
   overlay_image: /assets/images/title.jpg
-categories: blog en
+categories: blog
 tags: baz hoge
+lang: en
+ref: test0611
 ---
 = test01
 

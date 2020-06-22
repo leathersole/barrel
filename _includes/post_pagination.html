@@ -1,12 +1,38 @@
-{% if page.previous or page.next %}
+{% for post in site.posts %}
+  {% if post.lang == page.lang %}
+    {% if prev %}
+      {% assign prevpage = post %}
+      {% break %}
+    {% endif %}
+    {% assign prev = false %}
+    {% if post.id == page.id %}
+      {% assign prev = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% for post in site.posts reversed %}
+  {% if post.lang == page.lang %}
+    {% if next %}
+      {% assign nextpage = post %}
+      {% break %}
+    {% endif %}
+    {% assign next = false %}
+    {% if post.id == page.id %}
+      {% assign next = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% if prevpage or nextpage %}
   <nav class="pagination">
     {% if page.previous %}
-      <a href="{{ page.previous.url | relative_url }}" class="pagination--pager" title="{{ page.previous.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a>
+      <a href="{{ prevpage.url | relative_url }}" class="pagination--pager" title="{{ prevpage.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a>
     {% else %}
       <a href="#" class="pagination--pager disabled">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a>
     {% endif %}
     {% if page.next %}
-      <a href="{{ page.next.url | relative_url }}" class="pagination--pager" title="{{ page.next.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a>
+      <a href="{{ nextpage.url | relative_url }}" class="pagination--pager" title="{{ nextpage.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a>
     {% else %}
       <a href="#" class="pagination--pager disabled">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a>
     {% endif %}

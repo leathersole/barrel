@@ -4,6 +4,8 @@ author: Takayuki Konishi
 layout: single
 header:
   overlay_image: /assets/images/title.jpg
+ref: test01
+lang: en
 ---
 = test01
 
