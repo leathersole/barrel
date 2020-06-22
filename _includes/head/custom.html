@@ -2,25 +2,18 @@
 <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
 <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese" rel="stylesheet">
 <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
-{% for block in site.data.map %}
-{% for item in block[page.lang] %}
-{% if item == page.path %}
-{% for trans in block %}
-{% assign trans_path = trans[1] %}
 
-{% assign posts = site.posts | where:"path",trans_path %}
-{% for item in posts %}
-<link rel="alternate" hreflang="{{item.lang}}" href="{{item.url|absolute_url}}" />
+<!-- alternate links -->
+{% if page.ref %}
+{% assign posts=site.posts | where:"ref", page.ref | sort: 'lang' %}
+{% for post in posts %}
+  <link rel="alternate" hreflang="{{ post.lang }}" href="{{ post.url }}" />
 {% endfor %}
-
-{% assign pages = site.pages | where:"path",trans_path %}
-{% for item in pages %}
-<link rel="alternate" hreflang="{{item.lang}}" href="{{item.url|absolute_url}}" />
-{% endfor %}
+{% assign pages=site.pages | where:"ref", page.ref | sort: 'lang' %}
+{% for page in pages %}
+  <link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url }}" />
 {% endfor %}
 {% endif %}
-{% endfor %}
-{% endfor %}
 
 <!-- insert favicons. use https://realfavicongenerator.net/ -->
 
