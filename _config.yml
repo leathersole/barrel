@@ -27,6 +27,10 @@ twitter:
   username: "leather_sole"
 search: true
 breadcrumbs: true
+timezone: Asia/Tokyo
+
+lang: en
+languages: [en, ja]
 
 compress_html:
   clippings: all
@@ -58,6 +62,7 @@ jekyll-archives:
 
 # Outputting
 permalink: /:categories/:title/
+
 # paginate: 5
 # paginate_path: /recent/page:num/
 timezone: Asia/Tokyo
