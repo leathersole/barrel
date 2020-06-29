@@ -22,7 +22,7 @@ test:
 pages:
   stage: deploy
   script:
-  - bundle exec jekyll build -d public --config _config.yml -q
+  - bundle exec jekyll build -d public --config _config.yml,_config_gitlab.yml -q
   artifacts:
     paths:
     - public
