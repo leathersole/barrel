@@ -2,15 +2,13 @@
 #permalink: /:categories/:title/
 author: Takayuki Konishi
 layout: single
-header:
-  overlay_image: /assets/images/title.jpg
-categories: blog
-tags: baz hoge
-ref: test0611
+categories: blog product
+tags: crc 3scale openshift
+ref: deploy_3scale_on_crc
 lang: ja
 locale: ja
 ---
-= 日本語
+= 3scaleをCRCにデプロイ
 
 == test02
 test03
