@@ -123,7 +123,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 * `$ ./crc delete`
 * CRC仮想マシンを削除
 
-その後、`crc setup`のステップに戻ります。
+その後、 `crc setup` のステップに戻ります。
 
 === 特定のバージョンのOpenShiftを利用する
 前のバージョンのOpenShiftを利用する場合は、以下のページから該当するCRCをダウンロードできます。 +
