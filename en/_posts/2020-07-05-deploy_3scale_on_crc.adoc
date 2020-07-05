@@ -6,48 +6,47 @@ classes: wide
 categories: product
 tags: crc 3scale openshift
 ref: deploy_3scale_on_crc
-lang: ja
-locale: ja
+lang: en
+locale: en
 toc: true
-toc_label: 目次
+toc_label: Index
 ---
-= 3scaleをCRCにデプロイ
+= Deploying 3scale to CRC
 
-== はじめに
-API管理製品である link:https://www.redhat.com/ja/technologies/jboss-middleware/3scale[Red Hat 3scale API Management]をデスクトップやノートPCで動くOpenShift環境である link:https://developers.redhat.com/products/codeready-containers/overview[CodeReady Containers] にインストールする手順を紹介します。
+== Introduction
+This document will walk you through the process of installing link:https://www.redhat.com/ja/technologies/jboss-middleware/3scale[Red Hat 3scale API Management], an API management product, on link:https://developers.redhat.com/products/codeready-containers/overview[CodeReady Containers], an OpenShift environment running on desktops and laptops.
 
-== 前提条件
-=== システム要件
-CRCをインストールするには、以下のシステムリソースが必要です。
+== Prerequisites
+=== System requirements
+CRC requires the following system resources:
 
-* 仮想CPU 4
-* メモリー 8GB
-* ストレージ空き容量 35GB
+* 4 virtual CPUs (vCPUs)
+* 8 GB of memory
+* 35 GB of storage space
 
-Note: 詳細については、link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRCのドキュメント]を参照してください。
+Note: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRC - Minimum system requirements].
 
-=== アカウント
-Red Hat Developer Programへの登録が必要です。登録方法については link:https://rheb.hatenablog.com/entry/developer-program[赤帽エンジニアブログの記事] を参照してください。
+=== Accounts
+A Red Hat Developer account is required. For details on how to register, please refer to link:https://developers.redhat.com/[Red Hat Developer] page. 
 
-登録後に link:https://access.redhat.com/terms-based-registry/[Token Generator]でサービスアカウントを作成し、ユーザー名とトークンをメモしてください。
-ユーザー名は "12345678|username" のような書式で、トークンは"eyJhbGciOiJSUzUxMiJ..."のような長い文字列です。
+After registering, create a service account with the link:https://access.redhat.com/terms-based-registry/[Token Generator], then note the username and token.
 
-== 確認した環境
+== My tested environment
 * link:https://getfedora.org/[Fedora 31]
 * CRC 1.9.0
 * OpenShift 4.3.10
 * 3scale 2.8
 
-CRCはWindows版、macOS版、Linux版があるので、他の環境でも試してみてください。
+CRC is available for Windows, macOS, and Linux, so you can try it in other environments as well.
 
-== インストール手順
-. link:https://cloud.redhat.com/openshift/install/crc/installer-provisioned[ダウンロードページ]からCRCとPull Secretをダウンロードします。
-. ダウンロードしたCRCを展開して、コンソールで展開したディレクトリに移動します。
+== Installation procedure
+. Download CRC and Pull Secret from link:https://cloud.redhat.com/openshift/install/crc/installer-provisioned[this download page].
+. Extract the CRC archive file, then move to the extracted directory.
 . `$ ./crc setup`
 +
-Note: もしメモリーに余裕があれば、割当メモリーを増やすことをおすすめします。 `./crc config set memory 16384` を実行すると、CRCは16GBのメモリーを使用します。
+Note:  If you have more memory available on your PC, I recommend increasing the memory allocation. By running `./crc config set memory 16384`, CRC uses 16GB memory.
 . `$ ./crc start -p /path/to/pull-secret` +
-かなり時間がかかるのでしばらくお待ちください。以下のようなメッセージが出力されたらCRCの起動完了です。
+It will take quite a while, so please be patient. When the following message is output, the CRC has been started.
 +
 ....
 INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions 
@@ -59,32 +58,33 @@ Started the OpenShift cluster
 WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation 
 ....
 +
-起動時のメッセージに、ログインユーザー、パスワード、接続先などが出力されているのでメモしてください。また、CRCで起動完了の表示が出た後で、OpenShiftのWebコンソールにアクセスしても、まだ起動処理が継続している場合もあります。
-. `$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443`
-を実行して、ログインしてください。<password>は、出力されたパスワードで置き換えてください。
-. プロジェクトを作成してください。例えば、「3scale28」プロジェクトを作成する場合は以下の通りです。 +
+The login user, password, connection destination, etc. are printed in the startup message, so please note them. +
+After the CRC indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.
+. Login to the OpenShift with this command. `$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443` +
+Replace `<password>` with the generated password.
+. Create a project (e.g. 3scale28) +
 `$ oc new-project 3scale28`
-. 作成したサービスアカウントを元に、 `threescale-registry-auth` シークレットを作成します。
+. Create `threescale-registry-auth` secret in the project
 +
 ....
 $ oc create secret docker-registry threescale-registry-auth \
  --docker-server=registry.redhat.io \
- --docker-username="サービスアカウントのusername" \
- --docker-password="サービスアカウントのtoken"
+ --docker-username="your-registry-service-account-username" \
+ --docker-password="your-registry-service-account-password"
 ....
-. `$ crc console` を実行して、OpenShiftのウェブコンソールを開きます。
+. Run `$ crc console` to open the OpenShift web console.
 +
 image:operatorhub_marked.png[OperatorHub]
-. Administrator ビューを選択します。
-. OperatorHubを開きます。
-. 3scale を検索します。
-. `Red Hat Integration - 3scale` をクリックします。
-. `Install` ボタンをクリックします。
-. オペレーターをインストールするプロジェクト、インストール対象の3scaleのバージョン、自動アップデートの有無を選択します。最後に `Subscribe` ボタンをクリックします。
+. Select Administrator view.
+. Open OperatorHub.
+. Search "3scale".
+. Click `Red Hat Integration - 3scale`
+. Click `Install` button.
+. Select a project to install the operator, a 3scale version, enable/disable auto update. Click `Subscribe` button.
 +
 image:select_install_options.png[Select Install Options]
-. オペレーターをクリックし、API Managerの `Create Instance` をクリックします。
-. API Manager定義を以下のように編集し、 `Create` をクリックします。
+. Click the operator, then click `Create Instance` in API Manager box.
+. Edit API Manager definition as following, then click `Create`.
 +
 ....
 apiVersion: apps.3scale.net/v1alpha1
@@ -96,40 +96,40 @@ spec:
   wildcardDomain: apps-crc.testing
   resourceRequirementsEnabled: false
 ....
-. Developer ビューに切り替えます。
+. Flip to Developer view.
 +
 image:flip_to_developer_view.png[Flip to Developer view]
-. 全てのPodのロールアウトが完了したら、3scale管理ポータルにアクセスします。
-** 3scale管理ポータル: https://3scale-admin.apps-crc.testing/
-** IDとパスワードは `system-seed` シークレットの `ADMIN_USER` と `ADMIN_PASSWORD` を確認してください。
+. Once all the pods have been rolled out, access the 3scale admin portal.
+** 3scale admin portal: https://3scale-admin.apps-crc.testing/
+** Check `ADMIN_USER` and `ADMIN_PASSWORD` in the `system-seed` secret for your ID and password.
 *** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed
-** その他のRoutes
+** Other Routes
 *** https://console-openshift-console.apps-crc.testing/search/ns/3scale27?kind=Route
 
-== トラブルシューティング
-=== OperatorHubページで、"No OperatorHub Items Found"と表示される
-しばらく待ってから、Try again をクリックしてください。
+== Troubleshooting
+=== OperatorHub page shows "No OperatorHub Items Found"
+Wait for a while. The feature might not be ready yet.
 
-以下のドキュメントが参考になるかもしれません。 +
+This document may help. +
 link:https://github.com/operator-framework/operator-marketplace/blob/master/docs/troubleshooting.md#no-packages-show-up-in-the-ui-no-operatorhub-items-found[No packages show up in the UI (No OperatorHub Items Found)]
 
-=== 3scale Operator Podはロールアウトされたが、他のPodがロールアウトされない
-* `threescale-registry-auth` シークレットが設定されているか確認してください。
-=== CRCが起動しない
-以下のような操作を試してみてください。
+=== 3scale Operator is running, but no pods are rolled out.
+* Confirm whether `threescale-registry-auth` secret is created with the correct values.
+=== Cannot start CRC
+Try these operations:
 * `$ ./crc stop`
 * `$ ./crc delete`
-* CRC仮想マシンを削除
+* Remove the crc VM
 
-その後、`crc setup`のステップに戻ります。
+After that, back to `crc setup`.
 
-=== 特定のバージョンのOpenShiftを利用する
-前のバージョンのOpenShiftを利用する場合は、以下のページから該当するCRCをダウンロードできます。 +
+=== How to setup previous OCP versions
+If you need to run previous OCP versions, you can download the corresponding CRC from here: +
 https://mirror.openshift.com/pub/openshift-v4/clients/crc/ 
 
-.Table CRCとOpenShiftバージョンの対応
+.Table Corresponding OCP versions to CRC versions
 |===
-|CRCバージョン|OCPバージョン 
+|CRC version|OCP version 
 
 |1.0.0|4.2.0
 |1.1.0|4.2.2
