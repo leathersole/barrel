@@ -32,6 +32,8 @@ timezone: Asia/Tokyo
 lang: en
 languages: [en, ja]
 
+highlighter: rouge
+
 compress_html:
   clippings: all
   comments: all
@@ -130,6 +132,7 @@ asciidoctor:
   backend: html5s
   attributes:
     imagesdir: /assets/images
+    source-highlighter: rouge
 
 # Theme
 #theme: minima

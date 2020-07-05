@@ -8,10 +8,10 @@ source "https://rubygems.org"
 #
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
-gem "jekyll", "~> 3.8.7"
+gem "jekyll"
 
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
-gem "minima", "~> 2.0"
+# gem "minima", "~> 2.0"
 
 gem "minimal-mistakes-jekyll"
 
@@ -25,7 +25,7 @@ group :jekyll_plugins do
   gem 'jekyll-asciidoc'
   gem 'asciidoctor-html5s'
   gem "jekyll-feed", "~> 0.6"
-  gem 'pygments.rb', '~> 1.1.2'
+#  gem 'pygments.rb', '~> 1.1.2'
   gem 'jekyll-archives'
 end
 
@@ -37,5 +37,5 @@ install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
 end
 
 # Performance-booster for watching directories on Windows
-gem "wdm", "~> 0.1.0", :install_if => Gem.win_platform?
+# gem "wdm", "~> 0.1.0", :install_if => Gem.win_platform?
 
