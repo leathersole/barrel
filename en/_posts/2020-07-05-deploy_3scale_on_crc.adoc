@@ -115,6 +115,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 
 === 3scale Operator is running, but no pods are rolled out.
 * Confirm whether `threescale-registry-auth` secret is created with the correct values.
+
 === Cannot start CRC
 Try these operations:
 * `$ ./crc stop`

@@ -115,6 +115,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 
 === 3scale Operator Podはロールアウトされたが、他のPodがロールアウトされない
 * `threescale-registry-auth` シークレットが設定されているか確認してください。
+
 === CRCが起動しない
 以下のような操作を試してみてください。
 * `$ ./crc stop`
