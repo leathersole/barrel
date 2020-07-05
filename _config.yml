@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: tkonishi_notes
+title: Rolling In The Barrel
 title_separator: "|"
 #subtitle: "Version 2.0"
 name: "Takayuki Konishi"
