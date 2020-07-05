@@ -1,0 +1,144 @@
+---
+#permalink: /:categories/:title/
+author: Takayuki Konishi
+layout: single
+classes: wide
+categories: product
+tags: crc 3scale openshift
+ref: deploy_3scale_on_crc
+lang: ja
+locale: ja
+toc: true
+toc_label: 目次
+---
+= 3scaleをCRCにデプロイ
+
+== はじめに
+API管理製品である link:https://www.redhat.com/ja/technologies/jboss-middleware/3scale[Red Hat 3scale API Management]をデスクトップやノートPCで動くOpenShift環境である link:https://developers.redhat.com/products/codeready-containers/overview[CodeReady Containers] にインストールする手順を紹介します。
+
+== 前提条件
+=== システム要件
+CRCをインストールするには、以下のシステムリソースが必要です。
+
+* 仮想CPU 4
+* メモリー 8GB
+* ストレージ空き容量 35GB
+
+Note: 詳細については、link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRCのドキュメント]を参照してください。
+
+=== アカウント
+Red Hat Developer Programへの登録が必要です。登録方法については link:https://rheb.hatenablog.com/entry/developer-program[赤帽エンジニアブログの記事] を参照してください。
+
+登録後に link:https://access.redhat.com/terms-based-registry/[Token Generator]でサービスアカウントを作成し、ユーザー名とトークンをメモしてください。
+ユーザー名は "12345678|username" のような書式で、トークンは"eyJhbGciOiJSUzUxMiJ..."のような長い文字列です。
+
+== 確認した環境
+* link:https://getfedora.org/[Fedora 31]
+* CRC 1.9.0
+* OpenShift 4.3.10
+* 3scale 2.8
+
+CRCはWindows版、macOS版、Linux版があるので、他の環境でも試してみてください。
+
+== インストール手順
+. link:https://cloud.redhat.com/openshift/install/crc/installer-provisioned[ダウンロードページ]からCRCとPull Secretをダウンロードします。
+. ダウンロードしたCRCを展開して、コンソールで展開したディレクトリに移動します。
+. `$ ./crc setup`
++
+Note: もしメモリーに余裕があれば、割当メモリーを増やすことをおすすめします。 `./crc config set memory 16384` を実行すると、CRCは16GBのメモリーを使用します。
+. `$ ./crc start -p /path/to/pull-secret` +
+かなり時間がかかるのでしばらくお待ちください。以下のようなメッセージが出力されたらCRCの起動完了です。
++
+....
+INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions 
+INFO Then you can access it by running 'oc login -u developer -p developer https://api.crc.testing:6443'
+INFO To login as an admin, run 'oc login -u kubeadmin -p HeJWN-ckbCA-Q96Ds-Sj763 https://api.crc.testing:6443' 
+INFO                                              
+INFO You can now run 'crc console' and use these credentials to access the OpenShift web console
+Started the OpenShift cluster
+WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation 
+....
++
+起動時のメッセージに、ログインユーザー、パスワード、接続先などが出力されているのでメモしてください。また、CRCで起動完了の表示が出た後で、OpenShiftのWebコンソールにアクセスしても、まだ起動処理が継続している場合もあります。
+. `$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443`
+を実行して、ログインしてください。<password>は、出力されたパスワードで置き換えてください。
+. プロジェクトを作成してください。例えば、「3scale28」プロジェクトを作成する場合は以下の通りです。 +
+`$ oc new-project 3scale28`
+. 作成したサービスアカウントを元に、 `threescale-registry-auth` シークレットを作成します。
++
+....
+$ oc create secret docker-registry threescale-registry-auth \
+ --docker-server=registry.redhat.io \
+ --docker-username="サービスアカウントのusername" \
+ --docker-password="サービスアカウントのtoken"
+....
+. `$ crc console` を実行して、OpenShiftのウェブコンソールを開きます。
++
+image:operatorhub_marked.png[OperatorHub]
+. Administrator ビューを選択します。
+. OperatorHubを開きます。
+. 3scale を検索します。
+. `Red Hat Integration - 3scale` をクリックします。
+. `Install` ボタンをクリックします。
+. オペレーターをインストールするプロジェクト、インストール対象の3scaleのバージョン、自動アップデートの有無を選択します。最後に `Subscribe` ボタンをクリックします。
++
+image:select_install_options.png[Select Install Options]
+. オペレーターをクリックし、API Managerの `Create Instance` をクリックします。
+. API Manager定義を以下のように編集し、 `Create` をクリックします。
++
+....
+apiVersion: apps.3scale.net/v1alpha1
+kind: APIManager
+metadata:
+  name: example-apimanager
+  namespace: 3scale28
+spec:
+  wildcardDomain: apps-crc.testing
+  resourceRequirementsEnabled: false
+....
+. Developer ビューに切り替えます。
++
+image:flip_to_developer_view.png[Flip to Developer view]
+. 全てのPodのロールアウトが完了したら、3scale管理ポータルにアクセスします。
+** 3scale管理ポータル: https://3scale-admin.apps-crc.testing/
+** IDとパスワードは `system-seed` シークレットの `ADMIN_USER` と `ADMIN_PASSWORD` を確認してください。
+*** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed
+** その他のRoutes
+*** https://console-openshift-console.apps-crc.testing/search/ns/3scale27?kind=Route
+
+== トラブルシューティング
+=== OperatorHubページで、"No OperatorHub Items Found"と表示される
+しばらく待ってから、Try again をクリックしてください。
+
+以下のドキュメントが参考になるかもしれません。 +
+link:https://github.com/operator-framework/operator-marketplace/blob/master/docs/troubleshooting.md#no-packages-show-up-in-the-ui-no-operatorhub-items-found[No packages show up in the UI (No OperatorHub Items Found)]
+
+=== 3scale Operator Podはロールアウトされたが、他のPodがロールアウトされない
+* `threescale-registry-auth` シークレットが設定されているか確認してください。
+=== CRCが起動しない
+以下のような操作を試してみてください。
+* `$ ./crc stop`
+* `$ ./crc delete`
+* CRC仮想マシンを削除
+
+その後、`crc setup`のステップに戻ります。
+
+=== 特定のバージョンのOpenShiftを利用する
+前のバージョンのOpenShiftを利用する場合は、以下のページから該当するCRCをダウンロードできます。 +
+https://mirror.openshift.com/pub/openshift-v4/clients/crc/ 
+
+.Table CRCとOpenShiftバージョンの対応
+|===
+|CRCバージョン|OCPバージョン 
+
+|1.0.0|4.2.0
+|1.1.0|4.2.2
+|1.2.0|4.2.8
+|1.3.0|4.2.10
+|1.5.0|4.2.14
+|1.6.0|4.3.0
+|1.7.0|4.3.1
+|1.8.0|4.3.8
+|1.9.0|4.3.10
+|1.10.0|4.4.3
+|===
