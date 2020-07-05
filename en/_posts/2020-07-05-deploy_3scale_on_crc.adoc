@@ -118,6 +118,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 
 === Cannot start CRC
 Try these operations:
+
 * `$ ./crc stop`
 * `$ ./crc delete`
 * Remove the crc VM

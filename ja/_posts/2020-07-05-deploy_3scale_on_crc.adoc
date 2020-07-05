@@ -118,6 +118,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 
 === CRCが起動しない
 以下のような操作を試してみてください。
+
 * `$ ./crc stop`
 * `$ ./crc delete`
 * CRC仮想マシンを削除
