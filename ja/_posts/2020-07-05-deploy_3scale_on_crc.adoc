@@ -49,7 +49,8 @@ Note: もしメモリーに余裕があれば、割当メモリーを増やす�
 . `$ ./crc start -p /path/to/pull-secret` +
 かなり時間がかかるのでしばらくお待ちください。以下のようなメッセージが出力されたらCRCの起動完了です。
 +
-....
+[source]
+----
 INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions 
 INFO Then you can access it by running 'oc login -u developer -p developer https://api.crc.testing:6443'
 INFO To login as an admin, run 'oc login -u kubeadmin -p HeJWN-ckbCA-Q96Ds-Sj763 https://api.crc.testing:6443' 
@@ -57,21 +58,33 @@ INFO
 INFO You can now run 'crc console' and use these credentials to access the OpenShift web console
 Started the OpenShift cluster
 WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation 
-....
+----
 +
 起動時のメッセージに、ログインユーザー、パスワード、接続先などが出力されているのでメモしてください。また、CRCで起動完了の表示が出た後で、OpenShiftのWebコンソールにアクセスしても、まだ起動処理が継続している場合もあります。
-. `$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443`
-を実行して、ログインしてください。<password>は、出力されたパスワードで置き換えてください。
-. プロジェクトを作成してください。例えば、「3scale28」プロジェクトを作成する場合は以下の通りです。 +
-`$ oc new-project 3scale28`
+. 以下のコマンドOpenShiftにログインします。
++
+[source,bash]
+----
+$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443
+----
++
+`<password>` は、出力されたパスワードで置き換えてください。
+. プロジェクトを作成してください。例えば、「3scale28」プロジェクトを作成する場合は以下の通りです。
++
+[source,bash]
+----
+$ oc new-project 3scale28
+----
++
 . 作成したサービスアカウントを元に、 `threescale-registry-auth` シークレットを作成します。
 +
-....
+[source,bash]
+----
 $ oc create secret docker-registry threescale-registry-auth \
  --docker-server=registry.redhat.io \
  --docker-username="サービスアカウントのusername" \
  --docker-password="サービスアカウントのtoken"
-....
+----
 . `$ crc console` を実行して、OpenShiftのウェブコンソールを開きます。
 +
 image:operatorhub_marked.png[OperatorHub]
@@ -86,7 +99,8 @@ image:select_install_options.png[Select Install Options]
 . オペレーターをクリックし、API Managerの `Create Instance` をクリックします。
 . API Manager定義を以下のように編集し、 `Create` をクリックします。
 +
-....
+[source,yaml]
+----
 apiVersion: apps.3scale.net/v1alpha1
 kind: APIManager
 metadata:
@@ -95,7 +109,7 @@ metadata:
 spec:
   wildcardDomain: apps-crc.testing
   resourceRequirementsEnabled: false
-....
+----
 . Developer ビューに切り替えます。
 +
 image:flip_to_developer_view.png[Flip to Developer view]

@@ -48,30 +48,43 @@ Note:  If you have more memory available on your PC, I recommend increasing the 
 . `$ ./crc start -p /path/to/pull-secret` +
 It will take quite a while, so please be patient. When the following message is output, the CRC has been started.
 +
-....
-INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions 
+[source]
+----
+INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions
 INFO Then you can access it by running 'oc login -u developer -p developer https://api.crc.testing:6443'
 INFO To login as an admin, run 'oc login -u kubeadmin -p HeJWN-ckbCA-Q96Ds-Sj763 https://api.crc.testing:6443' 
 INFO                                              
 INFO You can now run 'crc console' and use these credentials to access the OpenShift web console
 Started the OpenShift cluster
 WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation 
-....
+----
 +
 The login user, password, connection destination, etc. are printed in the startup message, so please note them. +
 After the CRC indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.
-. Login to the OpenShift with this command. `$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443` +
+. Login to the OpenShift with this command. 
++
+[source,bash]
+----
+$ oc login -u kubeadmin -p <password> https://api.crc.testing:6443
+----
++
 Replace `<password>` with the generated password.
-. Create a project (e.g. 3scale28) +
-`$ oc new-project 3scale28`
+. Create a project (e.g. 3scale28)
++
+[source,bash]
+----
+$ oc new-project 3scale28
+----
++
 . Create `threescale-registry-auth` secret in the project
 +
-....
+[source,bash]
+----
 $ oc create secret docker-registry threescale-registry-auth \
  --docker-server=registry.redhat.io \
  --docker-username="your-registry-service-account-username" \
  --docker-password="your-registry-service-account-password"
-....
+----
 . Run `$ crc console` to open the OpenShift web console.
 +
 image:operatorhub_marked.png[OperatorHub]
@@ -86,7 +99,8 @@ image:select_install_options.png[Select Install Options]
 . Click the operator, then click `Create Instance` in API Manager box.
 . Edit API Manager definition as following, then click `Create`.
 +
-....
+[source,yaml]
+----
 apiVersion: apps.3scale.net/v1alpha1
 kind: APIManager
 metadata:
@@ -95,7 +109,7 @@ metadata:
 spec:
   wildcardDomain: apps-crc.testing
   resourceRequirementsEnabled: false
-....
+----
 . Flip to Developer view.
 +
 image:flip_to_developer_view.png[Flip to Developer view]
