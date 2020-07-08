@@ -22,6 +22,7 @@ CRC requires the following system resources:
 
 * 4 virtual CPUs (vCPUs)
 * 8 GB of memory
+** The procedure on this page recommends that you allocate at least 10GB of memory to the CRC virtual machine, preferably 16GB.
 * 35 GB of storage space
 
 Note: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRC - Minimum system requirements].

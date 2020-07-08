@@ -22,6 +22,7 @@ CRCをインストールするには、以下のシステムリソースが必�
 
 * 仮想CPU 4
 * メモリー 8GB
+** このページの手順では、CRC仮想マシンにメモリーを最低10GB、できれば16GB割り当てることをおすすめします。
 * ストレージ空き容量 35GB
 
 Note: 詳細については、link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRCのドキュメント]を参照してください。
