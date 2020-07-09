@@ -62,7 +62,13 @@ WARN The cluster might report a degraded or error state. This is expected since 
 ----
 +
 起動時のメッセージに、ログインユーザー、パスワード、接続先などが出力されているのでメモしてください。また、CRCで起動完了の表示が出た後で、OpenShiftのWebコンソールにアクセスしても、まだ起動処理が継続している場合もあります。
-. 以下のコマンドOpenShiftにログインします。
+. `oc` コマンドを有効にします。
++
+[source,bash]
+----
+$ eval $(./crc oc-env)
+----
+. OpenShiftにログインします。
 +
 [source,bash]
 ----

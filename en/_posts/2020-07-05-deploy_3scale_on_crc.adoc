@@ -62,6 +62,12 @@ WARN The cluster might report a degraded or error state. This is expected since 
 +
 The login user, password, connection destination, etc. are printed in the startup message, so please note them. +
 After the CRC indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.
+. Enable `oc` command.
++
+[source,bash]
+----
+$ eval $(./crc oc-env)
+----
 . Login to the OpenShift with this command. 
 +
 [source,bash]
