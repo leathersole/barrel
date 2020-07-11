@@ -125,7 +125,7 @@ image:flip_to_developer_view.png[Flip to Developer view]
 ** IDとパスワードは `system-seed` シークレットの `ADMIN_USER` と `ADMIN_PASSWORD` を確認してください。
 *** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed
 ** その他のRoutes
-*** https://console-openshift-console.apps-crc.testing/search/ns/3scale27?kind=Route
+*** https://console-openshift-console.apps-crc.testing/search/ns/3scale28?kind=Route
 
 == トラブルシューティング
 === OperatorHubページで、"No OperatorHub Items Found"と表示される

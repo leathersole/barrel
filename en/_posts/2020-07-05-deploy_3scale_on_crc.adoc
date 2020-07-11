@@ -125,7 +125,7 @@ image:flip_to_developer_view.png[Flip to Developer view]
 ** Check `ADMIN_USER` and `ADMIN_PASSWORD` in the `system-seed` secret for your ID and password.
 *** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed
 ** Other Routes
-*** https://console-openshift-console.apps-crc.testing/search/ns/3scale27?kind=Route
+*** https://console-openshift-console.apps-crc.testing/search/ns/3scale28?kind=Route
 
 == Troubleshooting
 === OperatorHub page shows "No OperatorHub Items Found"
