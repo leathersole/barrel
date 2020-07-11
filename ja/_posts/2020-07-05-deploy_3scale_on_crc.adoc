@@ -10,6 +10,7 @@ lang: ja
 locale: ja
 toc: true
 toc_label: 目次
+last_modified_at: 2020-07-11T12:12:00+09:00
 ---
 = 3scaleをCRCにデプロイ
 

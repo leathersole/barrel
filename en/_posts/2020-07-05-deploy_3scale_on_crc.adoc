@@ -10,6 +10,7 @@ lang: en
 locale: en
 toc: true
 toc_label: Index
+last_modified_at: 2020-07-11T12:12:00+09:00
 ---
 = Deploying 3scale to CRC
 
