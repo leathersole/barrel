@@ -26,7 +26,8 @@ CRCをインストールするには、以下のシステムリソースが必�
 ** このページの手順では、CRC仮想マシンにメモリーを最低10GB、できれば16GB割り当てることをおすすめします。
 * ストレージ空き容量 35GB
 
-Note: 詳細については、link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRCのドキュメント]を参照してください。
+[.notice]
+NOTE:  詳細については、link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRCのドキュメント]を参照してください。
 
 === アカウント
 Red Hat Developer Programへの登録が必要です。登録方法については link:https://rheb.hatenablog.com/entry/developer-program[赤帽エンジニアブログの記事] を参照してください。
@@ -47,7 +48,8 @@ CRCはWindows版、macOS版、Linux版があるので、他の環境でも試し
 . ダウンロードしたCRCを展開して、コンソールで展開したディレクトリに移動します。
 . `$ ./crc setup`
 +
-Note: もしメモリーに余裕があれば、割当メモリーを増やすことをおすすめします。 `./crc config set memory 16384` を実行すると、CRCは16GBのメモリーを使用します。
+[.notice]
+NOTE:  もしメモリーに余裕があれば、割当メモリーを増やすことをおすすめします。 `./crc config set memory 16384` を実行すると、CRCは16GBのメモリーを使用します。
 . `$ ./crc start -p /path/to/pull-secret` +
 かなり時間がかかるのでしばらくお待ちください。以下のようなメッセージが出力されたらCRCの起動完了です。
 +

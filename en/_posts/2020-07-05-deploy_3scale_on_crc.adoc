@@ -26,7 +26,8 @@ CRC requires the following system resources:
 ** The procedure on this page recommends that you allocate at least 10GB of memory to the CRC virtual machine, preferably 16GB.
 * 35 GB of storage space
 
-Note: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRC - Minimum system requirements].
+[.notice]
+NOTE: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRC - Minimum system requirements].
 
 === Accounts
 A Red Hat Developer account is required. For details on how to register, please refer to link:https://developers.redhat.com/[Red Hat Developer] page. 
@@ -46,7 +47,8 @@ CRC is available for Windows, macOS, and Linux, so you can try it in other envir
 . Extract the CRC archive file, then move to the extracted directory.
 . `$ ./crc setup`
 +
-Note:  If you have more memory available on your PC, I recommend increasing the memory allocation. By running `./crc config set memory 16384`, CRC uses 16GB memory.
+[.notice]
+NOTE:  If you have more memory available on your PC, I recommend increasing the memory allocation. By running `./crc config set memory 16384`, CRC uses 16GB memory.
 . `$ ./crc start -p /path/to/pull-secret` +
 It will take quite a while, so please be patient. When the following message is output, the CRC has been started.
 +
