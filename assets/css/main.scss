@@ -38,11 +38,11 @@ header div.page__meta{
   margin-right: 1em;
 }
 
-.notice{
+.notice .notice--info .notice--warning .notice--success .notice--danger{
   margin: 0;
   padding: 0.5em;
 }
 
-.notice > h6{
+.notice > h6, .notice--info > h6, .notice--warning > h6, .notice--success > h6, .notice--danger > h6{
   margin: 0.5em 0 0.5em;
 }
