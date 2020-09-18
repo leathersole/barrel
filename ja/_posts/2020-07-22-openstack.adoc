@@ -26,6 +26,7 @@ NOTE: このドキュメントは実験的な内容です。OSPは初めて触�
 ** OpenStackを簡単にインストールするツールです。今回使えるかもしれません。
 * link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/index[Red Hat OpenStack Platform 16.1 Quick Start Guide]
 ** オフィシャルドキュメントなので一番正しいドキュメントですが、知識がないので読み解けるか自信はありません。
+* link:https://access.redhat.com/articles/1127153[Evaluating OpenStack: Single-Node Deployment]
 
 == OpenShift側の要件
 * link:https://access.redhat.com/articles/4679401[OpenShift Container Platform on Red Hat OpenStack Platform Support Matrix]
@@ -92,13 +93,90 @@ OSPインストール前に以下のような作業を行いました。
 
 . BIOS更新
 . RHEL 8.1インストール、登録
+. ホスト名の設定 - osp.home.seannos.io
+
+== ストレージの設定
+
+link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/storage_guide/index[Storage Guide Red Hat OpenStack Platform 16.1 | Red Hat Customer Portal]
+
+=== cinder-volumesの設定
+
+tripleo-heat-installer-templates/deployment/cinder/cinder-common-container-puppet.yaml に、
+
+`/var/lib/cinder/cinder-volumes`が無ければループバックデバイスを作成する処理があるように見えるので、`/var/lib/cinder/cinder-volumes` にSSDを割り当てます。
+ループバックデバイスは、サイズがデフォルトで10GBしかないので役に立ちません。
+
+____
+                shell: |-       
+                  exit_code=0   
+                  existing_device=$(losetup -j /var/lib/cinder/cinder-volumes -l -O NAME | tail -n-1)
+                  if [[ -z "${existing_device}" ]]; then
+                      losetup -f /var/lib/cinder/cinder-volumes --show
+                      exit_code=2     
+                  else          
+                      echo ${existing_device%$'\n'*}
+                  fi            
+                  exit ${exit_code}   
+____
+
+この方法はダメでした。
+
+OpenStackのドキュメントには、 link:https://docs.openstack.org/mitaka/install-guide-rdo/cinder-storage-install.html[Cinderをインストールする手順] の記載があります。該当するストレージをLVMボリュームスキャンから除外するなどの案内がありますが、そもそも手順がかなり違うのでトラブルがない限り、無視しておきます。
+
+結論: vgectend、lvextend で cinder-volumes VGに追加する。
+TODO: 後でcinderの容量を確認
+
+=== swiftの設定
+
+link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/storage_guide/ch-manage-containers#con_install-and-configure-storage-nodes-for-rhel_osp-storage-guide[ドキュメント] によれば、ストレージをXFSでフォーマットして、 /srv/node/<デバイス名> でマウントするとSwiftのストレージとして認識されるようです。
 
 == OSPインストール
 
 link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/index[Quick Start Guide]に記載の手順は、意外なほどスムーズに進みました。
 
+standalone_parameters.yaml は、けっこう見直しが必要。
+TODO: 要調査: 一通り全部
+CloudDomainに ospがついたものをホスト名にしないといけないようだ。 CloudDomainがexample.comなら、osp.example.comをホスト名にしないといけない
+NeutronDNSDomain にマシン名でVMに紐づけられるようだ。NeutronDNSDomain が example.comで VMがcentos ならcentos.example.com が割り当てられる。
+
+link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/overcloud_parameters/core-overcloud-parameters[Core Overcloud Parameters]
+定義はこちらにある
+
+CloudDomain: osp.seannos.io
+CloudName: overcloud.osp.seannos.io
+Debug: true
+DeploymentUser: $USER
+DnsServer:
+  - 192.168.18.1
+NeutronPublicInterface: enp7s0
+NeutronDnsDomain: local.osp.seannos.io
+ControlPlaneStaticRoutes: []
 
 
+StandaloneEnableRoutedNetworks 定義は見当たらない。UndercloudEnableRoutedNetworks という設定はあるが、関係があるだろうか。
 
-== TODO
-. ストレージをSwifttとCinderに割り当て
+COntrolPlaneStaticRoutes - all-in-oneだと関係無さそう
+
+imageの登録がSELinuxによって阻害されてたようで、再起動したら解決したように見えた。
+
+EdgeRouterXから 192.168.19.0/24にアクセスできないようだ。NICの設定が必要か。
+Route 53からサブドメインの委任をするか。
+
+== 設定
+
+network
+
+    external network 名称は datacentre
+    Directorガイドに一通り書いてある。
+
+flavor
+image
+
+
+== References
+
+link:https://access.redhat.com/solutions/2210421[How can I revert to a clean undercloud in Red Hat Enterprise Linux Openstack Platform - Red Hat Customer Portal]
+
+link:https://www.slideshare.net/kajinamit/tripleo-deep-dive-11[TripleO Deep Dive 1.1]
+
+link:https://rheb.hatenablog.com/entry/openshift-on-openstack-director-1[OpenShift on OpenStackの一例]
