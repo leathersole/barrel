@@ -1,0 +1,134 @@
+---
+author: Takayuki Konishi
+layout: single
+classes: wide
+categories: trial
+tags: openstack
+ref: all_in_one_openstack
+lang: ja
+locale: ja
+toc: true
+toc_label: 目次
+---
+= All-in-one OpenStack 16.1 インストール
+
+[.notice--warning]
+NOTE: このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。
+
+== 背景
+OpenShift環境を構築するにあたって、OpenShiftインストーラーが対応している環境が必要です。AWSなどいくつか対応していますが、ここではOpenStackを試してみました。
+
+== 参考資料
+* link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/[Product Documentation for Red Hat OpenStack Platform 16.1]
+
+== All-in-one OSP
+本来OSPは複数のサーバーにコンポーネントを分散してデプロイするものですが、検証用に link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/index[サーバー1台にインストールする手順] が公開されているので、これに従ってインストールします。
+
+== 未解決の問題
+
+このドキュメントの手順では、以下の問題が残っています。
+
+* SELinux
+** この手順では SELinux のルールが不十分なので追加の設定が必要です。
+* OS再起動時の安定性
+** OSを再起動すると、タイミングの問題なのか各コンポーネントにアクセスできない場合があります。
+* ネットワークの安定性
+** OVSがエラーを出力する場合があります。
+* Swiftストレージの容量確認
+** Swiftストレージに1TBを割り当てたつもりですが、実際に設定できたか確認できていません。
+
+== システム要件 (link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/all-in-one-openstack-installation#prerequisites[Quick Start Guide 1.1])
+
+ネットワークインターフェースが2つ必要です。例えば以下のように設定します。
+
+* インターフェース eth0
+** default network 192.168.122.0/24
+** gateway 192.168.122.1
+* インターフェース eth1
+** management network 192.168.25.0/24
+** gateway 192.168.25.1
+
+== サンプル設定
+このページでは、以下のように設定します。
+
+ホスト名:: osp.example.com
+eth0 IPアドレス:: 192.168.122.2
+eth1 IPアドレス:: 192.168.25.2
+DNS server:: 192.168.25.1
+
+== 対象のハードウェア
+
+CPU:: Intel Xeon E5-2670 10 Core 20 Thread x 2。
+Memory:: 512GB
+SSD:: 256GB x 2台。まとめてシステム領域に使用。
+SSD:: 1TB x 2台。それぞれ、Cinder用、Swift用。
+
+== 事前準備
+ルーターの設定:: `eth0`、 `eth1` に固定IPを設定します。
+
+DNS設定:: `osp.example.com` に `eth1` の固定IPを設定します。
+
+RHEL 8.2インストール:: link:https://access.redhat.com/documentation/ja-jp/red_hat_enterprise_linux/8/[製品ドキュメント]に従ってインストール。
+
+ホスト名設定:: `# hostnamectl set-hostname osp.example.com`
+
+== ドキュメントと異なる設定
+Cinder volume:: ドキュメントの手順では、10GBのループバックデバイスを作成してCinder volumeに割り当てていますが、ここではSSDを1台割り当てます。
+Swift volume:: ドキュメントの手順では、システムストレージを利用します。ここではそれに加えてSSDを1台割り当てます。
+
+== インストール手順
+ドキュメントに記載されている部分は説明を省きます。
+
+. link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/installing-the-all-in-one-openstack-environment[Chapter 3] の手順に従ってユーザー作成、システムの登録、OpenStackのインストーラー（TripleO）のインストールを行います。
+. link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/configuring-the-all-in-one-openstack-installation[Chapter 4] の手順に従って `containers-prepare-parameters.yaml` と `standalone_parameters.yaml` を作成します。 `containers-prepare-parameters.yaml` は記載の手順で問題ありません。 `standalone_parameters.yaml` に関しても記載の手順でほとんど問題ありませんが、一点補足します。
+** `CloudDomain` に `example.com` を指定すると、OSPは `osp.example.com` を参照し、ホスト名と一致します。
+. Cinder volumeの設定を変更します。
+** 編集中
+. Swift volumeを設定します。
+** 編集中
+. link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/deploying-the-all-in-one-openstack-installation[Chapter 5] の手順に従って、OpenStackをインストールします。
+
+
+== over cloudを設定
+link:https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/examples#example-3-compute-with-tenant-and-provider-networks[9.3. Example 3] の手順に従ってOvercloudを設定します。この環境では、以下のように環境変数を設定します。
+
+----
+export OS_CLOUD=standalone
+export GATEWAY=192.168.25.1
+export STANDALONE_HOST=192.168.25.2
+export PUBLIC_NETWORK_CIDR=192.168.25.0/24
+export PRIVATE_NETWORK_CIDR=192.168.100.0/24
+export PUBLIC_NET_START=192.168.25.10
+export PUBLIC_NET_END=192.168.24.254
+export DNS_SERVER=192.168.25.1
+----
+
+手順を実施すると、 `ssh cirros@<FLOATING_IP>` にアクセスできます。
+
+== swiftなどのコマンド実行に必要な環境変数
+
+この環境でSwiftコマンドなどを実行すると、以下のエラーが発生します。
+
+----
+$ swift list
+Auth version 1.0 requires ST_AUTH, ST_USER, and ST_KEY environment variables
+to be set or overridden with -A, -U, or -K.
+
+Auth version 2.0 requires OS_AUTH_URL, OS_USERNAME, OS_PASSWORD, and
+OS_TENANT_NAME OS_TENANT_ID to be set or overridden with --os-auth-url,
+--os-username, --os-password, --os-tenant-name or os-tenant-id. Note:
+adding "-V 2" is necessary for this.
+----
+
+`os-auth-url` などを環境変数かオプションで設定する必要がありますが、この値は、インストール時に作成されている `standalone-ansible-xxxxxxxx/Standalone/scale_tasks.yaml` にありました。
+
+----
+    OS_AUTH_TYPE: password
+    OS_AUTH_URL: http://192.168.25.2:5000/v3
+    OS_IDENTITY_API_VERSION: 3
+    OS_PASSWORD: PASSWORDEXAMPLE
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_PROJECT_NAME: admin
+    OS_USERNAME: admin
+    OS_USER_DOMAIN_NAME: Default
+----
