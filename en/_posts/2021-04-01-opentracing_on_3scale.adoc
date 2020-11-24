@@ -1,0 +1,182 @@
+---
+#permalink: /:categories/:title/
+author: Takayuki Konishi
+layout: single
+classes: wide
+categories: product
+tags: 3scale openshift jaeger opentracing
+ref: opentracing_on_3scale
+lang: en
+locale: en
+toc: true
+toc_label: Index
+#last_modified_at: 2020-07-11T12:12:00+09:00
+---
+= OpenTracing on 3scale
+
+== Introduction
+This document will walk you through how to setup link:https://www.jaegertracing.io/[Jaeger], enable OpenTracing on link:https://github.com/3scale/APIcast[APIcast] and link:https://github.com/3scale/echo-api[3scale/echo-api: Simple sinatra app that returns back info about the request], then confirm the integration on link:https://www.openshift.com/[OpenShift 4.x].
+
+== Prerequisites
+=== Software requirements
+* link:https://www.openshift.com/products/container-platform[Red Hat OpenShift Container Platform] 4.6
+* link:https://www.redhat.com/en/technologies/jboss-middleware/3scale[Red Hat 3scale API Management] 2.9
+
+[.notice]
+NOTE: This procedure would work on some previous versions but isn't confirmed
+
+== My tested environment
+* link:https://getfedora.org/[Fedora 32]
+* link:https://developers.redhat.com/products/codeready-containers/overview[Red Hat CodeReady Containers(CRC)] 1.24.0
+* link:https://www.openshift.com/products/container-platform[OpenShift] 4.7.0
+* link:https://www.redhat.com/en/technologies/jboss-middleware/3scale[3scale] 2.10
+
+[.notice]
+NOTE: CRC is available for Windows, macOS, and Linux, so you can try it in other environments as well.
+
+== Setup procedure
+=== Install Red Hat OpenShift Jaeger operator
+. Open OperatorHub.
++
+image:20210401_opentracing_on_3scale_00_operatorhub.png[OperatorHub,scaledwidth="50%"]
++
+. Search `jaeger`, then click `Red Hat OpenShift Jaeger`.
++
+image:20210401_opentracing_on_3scale_01_operatorhub.png[OperatorHub,scaledwidth="50%"]
++
+. Click `Install`
++
+image:20210401_opentracing_on_3scale_02_1_jaeger_install.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Install` again.
++
+image:20210401_opentracing_on_3scale_02_2_jaeger_install.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Wait until the installation complete.
++
+image:20210401_opentracing_on_3scale_02_3_jaeger_install.png[Jaeger Operator Installation,scaledwidth="50%"]
+
+=== Create Jaeger
+. Open Installed Operators page, then click `Jaeger`. Make sure the project is your 3scale project.
++
+image:20210401_opentracing_on_3scale_03_installed_operators.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Create Jaeger`.
++
+image:20210401_opentracing_on_3scale_04_operator_details.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Create`.
++
+image:20210401_opentracing_on_3scale_05_create_jaeger.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Create`.
++
+image:20210401_opentracing_on_3scale_05_create_jaeger.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+.   `jaeger-all-in-one-in-memory` will be created.
++
+image:20210401_opentracing_on_3scale_06_created_jaeger.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Search `jaeger-all-in-one-in-memory` route, then open the location.
++
+image:20210401_opentracing_on_3scale_08_routes.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Login with OpenShift`.
++
+image:20210401_opentracing_on_3scale_09_1_login_Jeager.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Login to OpenShift as a user`.
++
+image:20210401_opentracing_on_3scale_09_2_login_Jeager.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Click `Allow selected permissions`.
++
+image:20210401_opentracing_on_3scale_09_3_login_Jeager.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Now you will see Jaeger UI.
++
+image:20210401_opentracing_on_3scale_10_jaeger_ui.png[Jaeger Operator Installation,scaledwidth="50%"]
++
+. Also there are 4 Jaeger services in the project.
++
+----
+$ oc get svc|grep '\(jaeger\|NAME\)'
+NAME                                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                  AGE
+jaeger-all-in-one-inmemory-agent                ClusterIP   None           <none>        5775/UDP,5778/TCP,6831/UDP,6832/UDP      5d
+jaeger-all-in-one-inmemory-collector            ClusterIP   10.217.5.218   <none>        9411/TCP,14250/TCP,14267/TCP,14268/TCP   5d
+jaeger-all-in-one-inmemory-collector-headless   ClusterIP   None           <none>        9411/TCP,14250/TCP,14267/TCP,14268/TCP   5d
+jaeger-all-in-one-inmemory-query                ClusterIP   10.217.4.66    <none>        443/TCP                                  5d
+----
+
+=== Configure APIcast
+
+Reference: link:https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.9/html/administering_the_api_gateway/operating-apicast#configuring_apicast_with_opentracing[Configuring APIcast with OpenTracing]
+
+. Configure `jaeger.json`
++
+[source,json]
+----
+{
+    "service_name": "apicast",
+    "disabled": false,
+    "sampler": {
+      "type": "const",
+      "param": 1
+    },
+    "reporter": {
+      "queueSize": 100,
+      "bufferFlushInterval": 10,
+      "logSpans": false,
+      "localAgentHostPort": "jaeger-all-in-one-inmemory-agent:6831"
+    },
+    "headers": {
+      "jaegerDebugHeader": "debug-id",
+      "jaegerBaggageHeader": "baggage",
+      "TraceContextHeaderName": "uber-trace-id",
+      "traceBaggageHeaderPrefix": "testctx-"
+    },
+    "baggage_restrictions": {
+        "denyBaggageOnInitializationFailure": false,
+        "hostPort": "127.0.0.1:5778",
+        "refreshInterval": 60
+    }
+ }
+----
++
+. Register jaeger.json as a ConfigMap
++
+[source,shell]
+----
+$ oc create configmap jaeger-config --from-file=./jaeger.json
+----
++
+. Mount the file on apicast-production
++
+[source,shell]
+----
+$ oc set volume dc/apicast-production --add --overwrite --name=jaeger-config --mount-path=/opt/app-root/src/conf.d//opentracing/jaeger_config.json --sub-path=jaeger.json --source='{"configMap":{"name":"jaeger-config","items":[{"key":"jaeger.json","path":"jaeger.json"}]}}'
+----
++
+. Add `OPENTRACING_TRACER` and `OPENTRACING_CONFIG` environment variables in apicast-production deploymentconfig then save the file.
++
+[source,yaml]
+----
+        - name: OPENTRACING_TRACER
+          value: jaeger          
+        - name: OPENTRACING_CONFIG
+          value: /opt/app-root/src/conf.d/opentracing/jaeger_config.json
+----
++
+. After deployed apicast-production, call a production base url of a product
+. Open Jaeger UI, select `apicast` service then click `Find Traces`.
++
+image:20210401_opentracing_on_3scale_11_find_apicast_traces.png[Find APIcast tracing,scaledwidth="50%"]
++
+. Traces are listed.
++
+image:20210401_opentracing_on_3scale_12_apicast_traces.png[APIcast tracing,scaledwidth="50%"]
+
+=== Install echo-api
+=== Configure echo-api
+=== Configure a product
+=== Test the integration
