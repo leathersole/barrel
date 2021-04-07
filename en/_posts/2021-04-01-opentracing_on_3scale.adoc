@@ -15,7 +15,7 @@ toc_label: Index
 = OpenTracing on 3scale
 
 == Introduction
-This document will walk you through how to setup link:https://www.jaegertracing.io/[Jaeger], enable OpenTracing on link:https://github.com/3scale/APIcast[APIcast] and link:https://github.com/3scale/echo-api[3scale/echo-api: Simple sinatra app that returns back info about the request], then confirm the integration on link:https://www.openshift.com/[OpenShift 4.x].
+This document will walk you through how to setup link:https://www.jaegertracing.io/[Jaeger], enable OpenTracing on link:https://github.com/3scale/APIcast[APIcast] and link:https://github.com/3scale/echo-api[Echo-api], then confirm the integration on link:https://www.openshift.com/[OpenShift 4.x].
 
 == Prerequisites
 === Software requirements
