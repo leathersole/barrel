@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Noto Sans CJK JP"),
+    local("Noto Sans JP"),
+    url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2) format('woff2'),
+    url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff) format('woff'),
+    url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.otf) format('opentype');
+}
+
+img.emoji {
+    height: 1em;
+    width: 1em;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -0.1em;
+}
+
+.en:lang(en), .fr:lang(fr), .zh:lang(zh), .ja:lang(ja){
+    /* font-weight: bold; */
+    border: solid rgba(0, 96, 144, .5);
+}
+.lang a{
+    display: inline;
+    margin: 0 0.1rem;
+    padding: 0em 0.2em;
+    background-color: white;
+    border-radius: 0.4em;
+}
