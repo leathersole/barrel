@@ -10,7 +10,7 @@ lang: en
 locale: en
 toc: true
 toc_label: Index
-last_modified_at: 2020-07-11T12:12:00+09:00
+last_modified_at: 2023-07-18T15:38:24+09:00
 ---
 = Deploying 3scale to OpenShift Local
 
