@@ -4,7 +4,7 @@ author: Takayuki Konishi
 layout: single
 classes: wide
 categories: product
-tags: crc 3scale openshift
+tags: crc 3scale openshift openshift_local
 ref: deploy_3scale_on_crc
 lang: en
 locale: en
@@ -12,59 +12,70 @@ toc: true
 toc_label: Index
 last_modified_at: 2020-07-11T12:12:00+09:00
 ---
-= Deploying 3scale to CRC
+= Deploying 3scale to OpenShift Local
 
 == Introduction
-This document will walk you through the process of installing link:https://www.redhat.com/ja/technologies/jboss-middleware/3scale[Red Hat 3scale API Management], an API management product, on link:https://developers.redhat.com/products/codeready-containers/overview[CodeReady Containers], an OpenShift environment running on desktops and laptops.
+This document will walk you through the process of installing link:https://www.redhat.com/ja/technologies/jboss-middleware/3scale[Red Hat 3scale API Management], an API management product, on link:https://developers.redhat.com/products/openshift-local/overview[OpenShift Local], an OpenShift environment running on desktops and laptops.
 
 == Prerequisites
 === System requirements
-CRC requires the following system resources:
+OpenShift Local requires the following system resources:
 
 * 4 virtual CPUs (vCPUs)
-* 8 GB of memory
-** The procedure on this page recommends that you allocate at least 10GB of memory to the CRC virtual machine, preferably 16GB.
+* 9 GB of memory
+** The procedure on this page recommends that you allocate at least 10GB of memory to the OpenShift Local virtual machine, preferably 16GB.
 * 35 GB of storage space
 
 [.notice]
-NOTE: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg[CRC - Minimum system requirements].
+NOTE: For more requirements, refer to link:https://access.redhat.com/documentation/en-us/red_hat_openshift_local/2.23/html/getting_started_guide/installing#minimum_system_requirements[OpenShift Local - Minimum system requirements].
 
 === Accounts
 A Red Hat Developer account is required. For details on how to register, please refer to link:https://developers.redhat.com/[Red Hat Developer] page. 
 
-After registering, create a service account with the link:https://access.redhat.com/terms-based-registry/[Token Generator], then note the username and token.
-
 == My tested environment
-* link:https://getfedora.org/[Fedora 31]
-* CRC 1.9.0
-* OpenShift 4.3.10
-* 3scale 2.8
+* link:https://getfedora.org/[Fedora 38]
+* OpenShift Local 2.23.0
+* OpenShift 4.13.3
+* 3scale 2.13
 
-CRC is available for Windows, macOS, and Linux, so you can try it in other environments as well.
+OpenShift Local is available for Windows, macOS, and Linux, so you can try it in other environments as well.
 
 == Installation procedure
-. Download CRC and Pull Secret from link:https://cloud.redhat.com/openshift/install/crc/installer-provisioned[this download page].
-. Extract the CRC archive file, then move to the extracted directory.
+. Download OpenShift Local and Pull Secret from link:https://console.redhat.com/openshift/create/local[this download page].
+. Extract the OpenShift Local archive file, move to the extracted directory, then run this command.
 . `$ ./crc setup`
 +
 [.notice]
-NOTE:  If you have more memory available on your PC, I recommend increasing the memory allocation. By running `./crc config set memory 16384`, CRC uses 16GB memory.
+NOTE:  If you have more memory available on your PC, I recommend increasing the memory allocation. By running `./crc config set memory 16384`, OpenShift Local will use 16GB memory.
++
+[.notice]
+NOTE:  The command name comes from CodeReady Containers, the former product name of OpenShift Local.
++
 . `$ ./crc start -p /path/to/pull-secret` +
-It will take quite a while, so please be patient. When the following message is output, the CRC has been started.
+It will take quite a while, so please be patient. When the following message is output, the OpenShift Local has been started.
 +
 [source]
 ----
-INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions
-INFO Then you can access it by running 'oc login -u developer -p developer https://api.crc.testing:6443'
-INFO To login as an admin, run 'oc login -u kubeadmin -p HeJWN-ckbCA-Q96Ds-Sj763 https://api.crc.testing:6443' 
-INFO                                              
-INFO You can now run 'crc console' and use these credentials to access the OpenShift web console
-Started the OpenShift cluster
-WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation 
+Started the OpenShift cluster.
+
+The server is accessible via web console at:
+  https://console-openshift-console.apps-crc.testing
+
+Log in as administrator:
+  Username: kubeadmin
+  Password: <password>
+
+Log in as user:
+  Username: developer
+  Password: developer
+
+Use the 'oc' command line interface:
+  $ eval $(crc oc-env)
+  $ oc login -u developer https://api.crc.testing:6443
 ----
 +
 The login user, password, connection destination, etc. are printed in the startup message, so please note them. +
-After the CRC indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.
+After the OpenShift Local indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.
 . Enable `oc` command.
 +
 [source,bash]
@@ -79,22 +90,13 @@ $ oc login -u kubeadmin -p <password> https://api.crc.testing:6443
 ----
 +
 Replace `<password>` with the generated password.
-. Create a project (e.g. 3scale28)
+. Create a project (e.g. 3scale)
 +
 [source,bash]
 ----
-$ oc new-project 3scale28
+$ oc new-project 3scale
 ----
 +
-. Create `threescale-registry-auth` secret in the project
-+
-[source,bash]
-----
-$ oc create secret docker-registry threescale-registry-auth \
- --docker-server=registry.redhat.io \
- --docker-username="your-registry-service-account-username" \
- --docker-password="your-registry-service-account-password"
-----
 . Run `$ crc console` to open the OpenShift web console.
 +
 image:operatorhub_marked.png[OperatorHub]
@@ -103,32 +105,32 @@ image:operatorhub_marked.png[OperatorHub]
 . Search "3scale".
 . Click `Red Hat Integration - 3scale`
 . Click `Install` button.
-. Select a project to install the operator, a 3scale version, enable/disable auto update. Click `Subscribe` button.
+. Select a project to install the operator, a 3scale version, enable/disable auto update. Click `Install` button.
 +
 image:select_install_options.png[Select Install Options]
-. Click the operator, then click `Create Instance` in API Manager box.
-. Edit API Manager definition as following, then click `Create`.
+. Click the operator, click `APIManager` tab, then click `Create APIManager`.
+. Select `YAML view`, edit APIManager definition as following, then click `Create`.
 +
 [source,yaml]
 ----
 apiVersion: apps.3scale.net/v1alpha1
 kind: APIManager
 metadata:
-  name: example-apimanager
-  namespace: 3scale28
+  name: apimanager-sample
+  namespace: 3scale
 spec:
   wildcardDomain: apps-crc.testing
   resourceRequirementsEnabled: false
 ----
-. Flip to Developer view.
+. Flip to Developer view, open Topology page.
 +
 image:flip_to_developer_view.png[Flip to Developer view]
 . Once all the pods have been rolled out, access the 3scale admin portal.
 ** 3scale admin portal: https://3scale-admin.apps-crc.testing/
 ** Check `ADMIN_USER` and `ADMIN_PASSWORD` in the `system-seed` secret for your ID and password.
-*** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed
+*** https://console-openshift-console.apps-crc.testing/k8s/ns/3scale/secrets/system-seed
 ** Other Routes
-*** https://console-openshift-console.apps-crc.testing/search/ns/3scale28?kind=Route
+*** https://console-openshift-console.apps-crc.testing/search/ns/3scale?kind=Route
 
 == Troubleshooting
 === OperatorHub page shows "No OperatorHub Items Found"
@@ -140,7 +142,7 @@ link:https://github.com/operator-framework/operator-marketplace/blob/master/docs
 === 3scale Operator is running, but no pods are rolled out.
 * Confirm whether `threescale-registry-auth` secret is created with the correct values.
 
-=== Cannot start CRC
+=== Cannot start OpenShift Local
 Try these operations:
 
 * `$ ./crc stop`
@@ -150,21 +152,5 @@ Try these operations:
 After that, back to `crc setup`.
 
 === How to setup previous OCP versions
-If you need to run previous OCP versions, you can download the corresponding CRC from here: +
+If you need to run previous OCP versions, you can download the corresponding OpenShift Local from here: +
 https://mirror.openshift.com/pub/openshift-v4/clients/crc/ 
-
-.Table Corresponding OCP versions to CRC versions
-|===
-|CRC version|OCP version 
-
-|1.0.0|4.2.0
-|1.1.0|4.2.2
-|1.2.0|4.2.8
-|1.3.0|4.2.10
-|1.5.0|4.2.14
-|1.6.0|4.3.0
-|1.7.0|4.3.1
-|1.8.0|4.3.8
-|1.9.0|4.3.10
-|1.10.0|4.4.3
-|===
