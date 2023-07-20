@@ -1,0 +1,617 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ja" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>3scaleをCRCにデプロイ | Rolling In The Barrel</title>
+<meta name="description" content="はじめにAPI管理製品である Red Hat 3scale API ManagementをデスクトップやノートPCで動くOpenShift環境である CodeReady Containers にインストールする手順を紹介します。">
+
+
+  <meta name="author" content="Takayuki Konishi">
+  
+  <meta property="article:author" content="Takayuki Konishi">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Rolling In The Barrel">
+<meta property="og:title" content="3scaleをCRCにデプロイ">
+<meta property="og:url" content="/ja/product/deploy_3scale_on_crc/">
+
+
+  <meta property="og:description" content="はじめにAPI管理製品である Red Hat 3scale API ManagementをデスクトップやノートPCで動くOpenShift環境である CodeReady Containers にインストールする手順を紹介します。">
+
+
+
+
+
+  <meta name="twitter:site" content="@leather_sole">
+  <meta name="twitter:title" content="3scaleをCRCにデプロイ">
+  <meta name="twitter:description" content="はじめにAPI管理製品である Red Hat 3scale API ManagementをデスクトップやノートPCで動くOpenShift環境である CodeReady Containers にインストールする手順を紹介します。">
+  <meta name="twitter:url" content="/ja/product/deploy_3scale_on_crc/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2020-07-05T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2020-07-11T12:12:00+09:00">
+
+
+
+
+<link rel="canonical" href="/ja/product/deploy_3scale_on_crc/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Takayuki Konishi",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Rolling In The Barrel Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="stylesheet" href="/assets/css/custom.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese" rel="stylesheet">
+<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
+
+<!-- alternate links -->
+
+
+
+  <link rel="alternate" hreflang="en" href="/en/product/deploy_3scale_on_crc/" />
+
+  <link rel="alternate" hreflang="ja" href="/ja/product/deploy_3scale_on_crc/" />
+
+
+
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          
+          <a class="site-title" href="/ja">
+        
+          Rolling In The Barrel
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        
+<div class="lang" id="langage-selector">
+        
+        
+        
+        
+        <a hreflang="en" href="/en/product/deploy_3scale_on_crc/" class="en" title="Open the English translation of this page">&#x1f1fa;&#x1f1f8;</a>
+        
+        
+        
+        <a hreflang="ja" href="/ja/product/deploy_3scale_on_crc/" class="ja" title="日本語版を開く">&#x1f1ef;&#x1f1f5;</a>
+        
+        
+        
+</div>
+
+
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#ja" itemprop="item"><span itemprop="name">Ja</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#product" itemprop="item"><span itemprop="name">Product</span></a>
+          <meta itemprop="position" content="3" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">3scaleをCRCにデプロイ</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/photo.jpg" alt="Takayuki Konishi" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Takayuki Konishi</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Technical support engineer, sean-nos dancer</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Japan</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+            <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="3scaleをCRCにデプロイ">
+    <meta itemprop="description" content="はじめにAPI管理製品である Red Hat 3scale API ManagementをデスクトップやノートPCで動くOpenShift環境である CodeReady Containers にインストールする手順を紹介します。">
+    <meta itemprop="datePublished" content="2020-07-05T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2020-07-11T12:12:00+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">3scaleをCRCにデプロイ
+</h1>
+          
+          <div class="page__meta">
+            
+            
+
+  <p class="page__date"><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Published: <time datetime="2020-07-05T00:00:00+09:00">2020-07-05</time>
+    
+      Updated: <time datetime="2020-07-11">2020-07-11</time>
+        
+  </p>
+
+
+            
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#3scale" class="page__taxonomy-item" rel="tag">3scale</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#crc" class="page__taxonomy-item" rel="tag">crc</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#openshift" class="page__taxonomy-item" rel="tag">openshift</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#ja" class="page__taxonomy-item" rel="tag">ja</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#product" class="page__taxonomy-item" rel="tag">product</a>
+    
+    </span>
+  </p>
+
+
+          </div>
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> 目次</h4></header>
+              <ul class="toc__menu"><li><a href="#はじめに">はじめに</a></li><li><a href="#前提条件">前提条件</a><ul><li><a href="#システム要件">システム要件</a></li><li><a href="#アカウント">アカウント</a></li></ul></li><li><a href="#確認した環境">確認した環境</a></li><li><a href="#インストール手順">インストール手順</a></li><li><a href="#トラブルシューティング">トラブルシューティング</a><ul><li><a href="#operatorhubページでno-operatorhub-items-foundと表示される">OperatorHubページで、"No OperatorHub Items Found"と表示される</a></li><li><a href="#3scale-operator-podはロールアウトされたが他のpodがロールアウトされない">3scale Operator Podはロールアウトされたが、他のPodがロールアウトされない</a></li><li><a href="#crcが起動しない">CRCが起動しない</a></li><li><a href="#特定のバージョンのopenshiftを利用する">特定のバージョンのOpenShiftを利用する</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <section class="doc-section level-1"><h2 id="はじめに">はじめに</h2><p>API管理製品である <a href="https://www.redhat.com/ja/technologies/jboss-middleware/3scale">Red Hat 3scale API Management</a>をデスクトップやノートPCで動くOpenShift環境である <a href="https://developers.redhat.com/products/codeready-containers/overview">CodeReady Containers</a> にインストールする手順を紹介します。</p></section>
+<section class="doc-section level-1"><h2 id="前提条件">前提条件</h2><section class="doc-section level-2"><h3 id="システム要件">システム要件</h3><p>CRCをインストールするには、以下のシステムリソースが必要です。</p>
+<div class="ulist"><ul><li>仮想CPU 4</li><li>メモリー 8GB<ul><li>このページの手順では、CRC仮想マシンにメモリーを最低10GB、できれば16GB割り当てることをおすすめします。</li></ul></li><li>ストレージ空き容量 35GB</li></ul></div>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>詳細については、<a href="https://access.redhat.com/documentation/en-us/red_hat_codeready_containers/1.9/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg">CRCのドキュメント</a>を参照してください。</p></aside></section>
+<section class="doc-section level-2"><h3 id="アカウント">アカウント</h3><p>Red Hat Developer Programへの登録が必要です。登録方法については <a href="https://rheb.hatenablog.com/entry/developer-program">赤帽エンジニアブログの記事</a> を参照してください。</p>
+<p>登録後に <a href="https://access.redhat.com/terms-based-registry/">Token Generator</a>でサービスアカウントを作成し、ユーザー名とトークンをメモしてください。
+ユーザー名は "12345678|username" のような書式で、トークンは"eyJhbGciOiJSUzUxMiJ&#8230;&#8203;"のような長い文字列です。</p></section></section>
+<section class="doc-section level-1"><h2 id="確認した環境">確認した環境</h2><div class="ulist"><ul><li><a href="https://getfedora.org/">Fedora 31</a></li><li>CRC 1.9.0</li><li>OpenShift 4.3.10</li><li>3scale 2.8</li></ul></div>
+<p>CRCはWindows版、macOS版、Linux版があるので、他の環境でも試してみてください。</p></section>
+<section class="doc-section level-1"><h2 id="インストール手順">インストール手順</h2><div class="olist arabic"><ol class="arabic"><li><a href="https://cloud.redhat.com/openshift/install/crc/installer-provisioned">ダウンロードページ</a>からCRCとPull Secretをダウンロードします。</li><li>ダウンロードしたCRCを展開して、コンソールで展開したディレクトリに移動します。</li><li><p><code>$ ./crc setup</code></p><aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>もしメモリーに余裕があれば、割当メモリーを増やすことをおすすめします。 <code>./crc config set memory 16384</code> を実行すると、CRCは16GBのメモリーを使用します。</p></aside></li><li><p><code>$ ./crc start -p /path/to/pull-secret</code><br>
+かなり時間がかかるのでしばらくお待ちください。以下のようなメッセージが出力されたらCRCの起動完了です。</p><div class="listing-block"><pre class="rouge highlight"><code>INFO To access the cluster, first set up your environment by following 'crc oc-env' instructions
+INFO Then you can access it by running 'oc login -u developer -p developer https://api.crc.testing:6443'
+INFO To login as an admin, run 'oc login -u kubeadmin -p HeJWN-ckbCA-Q96Ds-Sj763 https://api.crc.testing:6443'
+INFO
+INFO You can now run 'crc console' and use these credentials to access the OpenShift web console
+Started the OpenShift cluster
+WARN The cluster might report a degraded or error state. This is expected since several operators have been disabled to lower the resource usage. For more information, please consult the documentation</code></pre></div>
+<p>起動時のメッセージに、ログインユーザー、パスワード、接続先などが出力されているのでメモしてください。また、CRCで起動完了の表示が出た後で、OpenShiftのWebコンソールにアクセスしても、まだ起動処理が継続している場合もあります。</p></li><li><p><code>oc</code> コマンドを有効にします。</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span><span class="nb">eval</span> <span class="si">$(</span>./crc oc-env<span class="si">)</span></code></pre></div></li><li><p>OpenShiftにログインします。</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>oc login <span class="nt">-u</span> kubeadmin <span class="nt">-p</span> &lt;password&gt; https://api.crc.testing:6443</code></pre></div>
+<p><code>&lt;password&gt;</code> は、出力されたパスワードで置き換えてください。</p></li><li><p>プロジェクトを作成してください。例えば、「3scale28」プロジェクトを作成する場合は以下の通りです。</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>oc new-project 3scale28</code></pre></div></li><li><p>作成したサービスアカウントを元に、 <code>threescale-registry-auth</code> シークレットを作成します。</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>oc create secret docker-registry threescale-registry-auth <span class="se">\</span>
+ <span class="nt">--docker-server</span><span class="o">=</span>registry.redhat.io <span class="se">\</span>
+ <span class="nt">--docker-username</span><span class="o">=</span><span class="s2">"サービスアカウントのusername"</span> <span class="se">\</span>
+ <span class="nt">--docker-password</span><span class="o">=</span><span class="s2">"サービスアカウントのtoken"</span></code></pre></div></li><li><p><code>$ crc console</code> を実行して、OpenShiftのウェブコンソールを開きます。</p><p><img src="/assets/images/operatorhub_marked.png" alt="OperatorHub"></p></li><li>Administrator ビューを選択します。</li><li>OperatorHubを開きます。</li><li>3scale を検索します。</li><li><code>Red Hat Integration - 3scale</code> をクリックします。</li><li><code>Install</code> ボタンをクリックします。</li><li><p>オペレーターをインストールするプロジェクト、インストール対象の3scaleのバージョン、自動アップデートの有無を選択します。最後に <code>Subscribe</code> ボタンをクリックします。</p><p><img src="/assets/images/select_install_options.png" alt="Select Install Options"></p></li><li>オペレーターをクリックし、API Managerの <code>Create Instance</code> をクリックします。</li><li><p>API Manager定義を以下のように編集し、 <code>Create</code> をクリックします。</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps.3scale.net/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">APIManager</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-apimanager</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">3scale28</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">wildcardDomain</span><span class="pi">:</span> <span class="s">apps-crc.testing</span>
+  <span class="na">resourceRequirementsEnabled</span><span class="pi">:</span> <span class="kc">false</span></code></pre></div></li><li><p>Developer ビューに切り替えます。</p><p><img src="/assets/images/flip_to_developer_view.png" alt="Flip to Developer view"></p></li><li>全てのPodのロールアウトが完了したら、3scale管理ポータルにアクセスします。<ul><li>3scale管理ポータル: <a class="bare" href="https://3scale-admin.apps-crc.testing/">https://3scale-admin.apps-crc.testing/</a></li><li>IDとパスワードは <code>system-seed</code> シークレットの <code>ADMIN_USER</code> と <code>ADMIN_PASSWORD</code> を確認してください。<ul><li><a class="bare" href="https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed">https://console-openshift-console.apps-crc.testing/k8s/ns/3scale28/secrets/system-seed</a></li></ul></li><li>その他のRoutes<ul><li><a class="bare" href="https://console-openshift-console.apps-crc.testing/search/ns/3scale28?kind=Route">https://console-openshift-console.apps-crc.testing/search/ns/3scale28?kind=Route</a></li></ul></li></ul></li></ol></div></section>
+<section class="doc-section level-1"><h2 id="トラブルシューティング">トラブルシューティング</h2><section class="doc-section level-2"><h3 id="operatorhubページでno-operatorhub-items-foundと表示される">OperatorHubページで、"No OperatorHub Items Found"と表示される</h3><p>しばらく待ってから、Try again をクリックしてください。</p>
+<p>以下のドキュメントが参考になるかもしれません。<br>
+<a href="https://github.com/operator-framework/operator-marketplace/blob/master/docs/troubleshooting.md#no-packages-show-up-in-the-ui-no-operatorhub-items-found">No packages show up in the UI (No OperatorHub Items Found)</a></p></section>
+<section class="doc-section level-2"><h3 id="3scale-operator-podはロールアウトされたが他のpodがロールアウトされない">3scale Operator Podはロールアウトされたが、他のPodがロールアウトされない</h3><div class="ulist"><ul><li><code>threescale-registry-auth</code> シークレットが設定されているか確認してください。</li></ul></div></section>
+<section class="doc-section level-2"><h3 id="crcが起動しない">CRCが起動しない</h3><p>以下のような操作を試してみてください。</p>
+<div class="ulist"><ul><li><code>$ ./crc stop</code></li><li><code>$ ./crc delete</code></li><li>CRC仮想マシンを削除</li></ul></div>
+<p>その後、 <code>crc setup</code> のステップに戻ります。</p></section>
+<section class="doc-section level-2"><h3 id="特定のバージョンのopenshiftを利用する">特定のバージョンのOpenShiftを利用する</h3><p>前のバージョンのOpenShiftを利用する場合は、以下のページから該当するCRCをダウンロードできます。<br>
+<a class="bare" href="https://mirror.openshift.com/pub/openshift-v4/clients/crc/">https://mirror.openshift.com/pub/openshift-v4/clients/crc/</a></p>
+<figure class="table-block"><figcaption>Table 1. Table CRCとOpenShiftバージョンの対応</figcaption>
+<table class="frame-all grid-all stretch"><colgroup><col style="width: 50%;"><col style="width: 50%;"></colgroup><thead><tr><th class="halign-left valign-top">CRCバージョン</th><th class="halign-left valign-top">OCPバージョン</th></tr></thead><tbody><tr><td class="halign-left valign-top">1.0.0</td><td class="halign-left valign-top">4.2.0</td></tr><tr><td class="halign-left valign-top">1.1.0</td><td class="halign-left valign-top">4.2.2</td></tr><tr><td class="halign-left valign-top">1.2.0</td><td class="halign-left valign-top">4.2.8</td></tr><tr><td class="halign-left valign-top">1.3.0</td><td class="halign-left valign-top">4.2.10</td></tr><tr><td class="halign-left valign-top">1.5.0</td><td class="halign-left valign-top">4.2.14</td></tr><tr><td class="halign-left valign-top">1.6.0</td><td class="halign-left valign-top">4.3.0</td></tr><tr><td class="halign-left valign-top">1.7.0</td><td class="halign-left valign-top">4.3.1</td></tr><tr><td class="halign-left valign-top">1.8.0</td><td class="halign-left valign-top">4.3.8</td></tr><tr><td class="halign-left valign-top">1.9.0</td><td class="halign-left valign-top">4.3.10</td></tr><tr><td class="halign-left valign-top">1.10.0</td><td class="halign-left valign-top">4.4.3</td></tr></tbody></table></figure></section></section>
+        
+      </section>
+
+      <footer class="page__meta">
+      </footer>
+
+      
+
+      
+  
+
+  
+    
+    
+    
+  
+
+  
+    
+    
+    
+  
+
+  
+
+
+
+  
+
+  
+    
+    
+    
+  
+
+  
+    
+      
+      
+
+
+  <nav class="pagination">
+    
+      <a href="" class="pagination--pager" title="
+">Previous</a>
+    
+    
+      <a href="/ja/trial/openstack/" class="pagination--pager" title="All-in-one OpenStack 16.1 インストール
+">Next</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Takayuki Konishi. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a>, <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a> &amp; <a href="https://asciidoctor.org/" rel="nofollow">AsciiDoc</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+<script>
+  twemoji.parse(document.getElementById("langage-selector"));
+</script>
+
+
+
+  </body>
+</html>
+

@@ -1,0 +1,605 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ja" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>All-in-one OpenStack 16.1 インストール | Rolling In The Barrel</title>
+<meta name="description" content="Note: このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。">
+
+
+  <meta name="author" content="Takayuki Konishi">
+  
+  <meta property="article:author" content="Takayuki Konishi">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Rolling In The Barrel">
+<meta property="og:title" content="All-in-one OpenStack 16.1 インストール">
+<meta property="og:url" content="/ja/trial/openstack/">
+
+
+  <meta property="og:description" content="Note: このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。">
+
+
+
+
+
+  <meta name="twitter:site" content="@leather_sole">
+  <meta name="twitter:title" content="All-in-one OpenStack 16.1 インストール">
+  <meta name="twitter:description" content="Note: このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。">
+  <meta name="twitter:url" content="/ja/trial/openstack/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2020-09-26T00:00:00+09:00">
+
+
+
+
+
+
+<link rel="canonical" href="/ja/trial/openstack/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Takayuki Konishi",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Rolling In The Barrel Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="stylesheet" href="/assets/css/custom.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese" rel="stylesheet">
+<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
+
+<!-- alternate links -->
+
+
+
+  <link rel="alternate" hreflang="ja" href="/ja/trial/openstack/" />
+
+
+
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          
+          <a class="site-title" href="/ja">
+        
+          Rolling In The Barrel
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        
+<div class="lang" id="langage-selector">
+        
+        
+        
+        
+        <a hreflang="ja" href="/ja/trial/openstack/" class="ja" title="日本語版を開く">&#x1f1ef;&#x1f1f5;</a>
+        
+        
+        
+</div>
+
+
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#ja" itemprop="item"><span itemprop="name">Ja</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#trial" itemprop="item"><span itemprop="name">Trial</span></a>
+          <meta itemprop="position" content="3" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">All-in-one OpenStack 16.1 インストール</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/photo.jpg" alt="Takayuki Konishi" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Takayuki Konishi</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Technical support engineer, sean-nos dancer</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Japan</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+            <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="All-in-one OpenStack 16.1 インストール">
+    <meta itemprop="description" content="Note: このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。">
+    <meta itemprop="datePublished" content="2020-09-26T00:00:00+09:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">All-in-one OpenStack 16.1 インストール
+</h1>
+          
+          <div class="page__meta">
+            
+            
+
+  <p class="page__date"><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Published: <time datetime="2020-09-26T00:00:00+09:00">2020-09-26</time>
+        
+  </p>
+
+
+            
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#openstack" class="page__taxonomy-item" rel="tag">openstack</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#ja" class="page__taxonomy-item" rel="tag">ja</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#trial" class="page__taxonomy-item" rel="tag">trial</a>
+    
+    </span>
+  </p>
+
+
+          </div>
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> 目次</h4></header>
+              <ul class="toc__menu"><li><a href="#背景">背景</a></li><li><a href="#参考資料">参考資料</a></li><li><a href="#all-in-one-osp">All-in-one OSP</a></li><li><a href="#未解決の問題">未解決の問題</a></li><li><a href="#システム要件-quick-start-guide-1-1">システム要件 (Quick Start Guide 1.1)</a></li><li><a href="#サンプル設定">サンプル設定</a></li><li><a href="#対象のハードウェア">対象のハードウェア</a></li><li><a href="#事前準備">事前準備</a></li><li><a href="#ドキュメントと異なる設定">ドキュメントと異なる設定</a></li><li><a href="#インストール手順">インストール手順</a></li><li><a href="#over-cloudを設定">over cloudを設定</a></li><li><a href="#swiftなどのコマンド実行に必要な環境変数">swiftなどのコマンド実行に必要な環境変数</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <section id="preamble" aria-label="Preamble"><aside class="admonition-block note notice--warning" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>このドキュメントは実験的な内容です。OpenStackは初めて触るので、適切な方法でない可能性があります。後述する未解決の問題があります。特定の環境で実施しただけで、他の環境に適用できる保証はありません。最後に、All-in-one OpenStackは16.1ではテクニカルプレビューなのでフルサポートされているインストール方法ではありません。</p></aside></section>
+<section class="doc-section level-1"><h2 id="背景">背景</h2><p>OpenShift環境を構築するにあたって、OpenShiftインストーラーが対応している環境が必要です。AWSなどいくつか対応していますが、ここではOpenStackを試してみました。</p></section>
+<section class="doc-section level-1"><h2 id="参考資料">参考資料</h2><div class="ulist"><ul><li><a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/">Product Documentation for Red Hat OpenStack Platform 16.1</a></li></ul></div></section>
+<section class="doc-section level-1"><h2 id="all-in-one-osp">All-in-one OSP</h2><p>本来OSPは複数のサーバーにコンポーネントを分散してデプロイするものですが、検証用に <a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/index">サーバー1台にインストールする手順</a> が公開されているので、これに従ってインストールします。</p></section>
+<section class="doc-section level-1"><h2 id="未解決の問題">未解決の問題</h2><p>このドキュメントの手順では、以下の問題が残っています。</p>
+<div class="ulist"><ul><li>SELinux<ul><li>この手順では SELinux のルールが不十分なので追加の設定が必要です。</li></ul></li><li>OS再起動時の安定性<ul><li>OSを再起動すると、タイミングの問題なのか各コンポーネントにアクセスできない場合があります。</li></ul></li><li>ネットワークの安定性<ul><li>OVSがエラーを出力する場合があります。</li></ul></li><li>Swiftストレージの容量確認<ul><li>Swiftストレージに1TBを割り当てたつもりですが、実際に設定できたか確認できていません。</li></ul></li></ul></div></section>
+<section class="doc-section level-1"><h2 id="システム要件-quick-start-guide-1-1">システム要件 (<a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/all-in-one-openstack-installation#prerequisites">Quick Start Guide 1.1</a>)</h2><p>ネットワークインターフェースが2つ必要です。例えば以下のように設定します。</p>
+<div class="ulist"><ul><li>インターフェース eth0<ul><li>default network 192.168.122.0/24</li><li>gateway 192.168.122.1</li></ul></li><li>インターフェース eth1<ul><li>management network 192.168.25.0/24</li><li>gateway 192.168.25.1</li></ul></li></ul></div></section>
+<section class="doc-section level-1"><h2 id="サンプル設定">サンプル設定</h2><p>このページでは、以下のように設定します。</p>
+<div class="dlist"><dl><dt>ホスト名</dt><dd>osp.example.com</dd><dt>eth0 IPアドレス</dt><dd>192.168.122.2</dd><dt>eth1 IPアドレス</dt><dd>192.168.25.2</dd><dt>DNS server</dt><dd>192.168.25.1</dd></dl></div></section>
+<section class="doc-section level-1"><h2 id="対象のハードウェア">対象のハードウェア</h2><div class="dlist"><dl><dt>CPU</dt><dd>Intel Xeon E5-2670 10 Core 20 Thread x 2。</dd><dt>Memory</dt><dd>512GB</dd><dt>SSD</dt><dd>256GB x 2台。まとめてシステム領域に使用。</dd><dt>SSD</dt><dd>1TB x 2台。それぞれ、Cinder用、Swift用。</dd></dl></div></section>
+<section class="doc-section level-1"><h2 id="事前準備">事前準備</h2><div class="dlist"><dl><dt>ルーターの設定</dt><dd><code>eth0</code>、 <code>eth1</code> に固定IPを設定します。</dd><dt>DNS設定</dt><dd><code>osp.example.com</code> に <code>eth1</code> の固定IPを設定します。</dd><dt>RHEL 8.2インストール</dt><dd><a href="https://access.redhat.com/documentation/ja-jp/red_hat_enterprise_linux/8/">製品ドキュメント</a>に従ってインストール。</dd><dt>ホスト名設定</dt><dd><code># hostnamectl set-hostname osp.example.com</code></dd></dl></div></section>
+<section class="doc-section level-1"><h2 id="ドキュメントと異なる設定">ドキュメントと異なる設定</h2><div class="dlist"><dl><dt>Cinder volume</dt><dd>ドキュメントの手順では、10GBのループバックデバイスを作成してCinder volumeに割り当てていますが、ここではSSDを1台割り当てます。</dd><dt>Swift volume</dt><dd>ドキュメントの手順では、システムストレージを利用します。ここではそれに加えてSSDを1台割り当てます。</dd></dl></div></section>
+<section class="doc-section level-1"><h2 id="インストール手順">インストール手順</h2><p>ドキュメントに記載されている部分は説明を省きます。</p>
+<div class="olist arabic"><ol class="arabic"><li><a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/installing-the-all-in-one-openstack-environment">Chapter 3</a> の手順に従ってユーザー作成、システムの登録、OpenStackのインストーラー（TripleO）のインストールを行います。</li><li><a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/configuring-the-all-in-one-openstack-installation">Chapter 4</a> の手順に従って <code>containers-prepare-parameters.yaml</code> と <code>standalone_parameters.yaml</code> を作成します。 <code>containers-prepare-parameters.yaml</code> は記載の手順で問題ありません。 <code>standalone_parameters.yaml</code> に関しても記載の手順でほとんど問題ありませんが、一点補足します。<ul><li><code>CloudDomain</code> に <code>example.com</code> を指定すると、OSPは <code>osp.example.com</code> を参照し、ホスト名と一致します。</li></ul></li><li>Cinder volumeの設定を変更します。<ul><li>編集中</li></ul></li><li><p>Swift volumeを設定します。</p><p>この環境では、はSwift用のSSDは <code>/dev/sdd</code> です。 <code>fdisk</code> で <code>sdd1</code> パーティションを作成後します。その後にXFSでフォーマットします。</p>
+<div class="listing-block"><pre>mkfs.xfs /dev/sdd1
+mkdir -p /srv/node/sdd1</pre></div>
+<p><code>/etc/fstab</code> に <code>/dev/sdd1 /srv/node/sdd1 xfs defaults    0 2</code> を追加します。</p></li><li><a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/deploying-the-all-in-one-openstack-installation">Chapter 5</a> の手順に従って、OpenStackをインストールします。</li></ol></div></section>
+<section class="doc-section level-1"><h2 id="over-cloudを設定">over cloudを設定</h2><p><a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.1/html/quick_start_guide/examples#example-3-compute-with-tenant-and-provider-networks">9.3. Example 3</a> の手順に従ってOvercloudを設定します。この環境では、以下のように環境変数を設定します。</p>
+<div class="listing-block"><pre>export OS_CLOUD=standalone
+export GATEWAY=192.168.25.1
+export STANDALONE_HOST=192.168.25.2
+export PUBLIC_NETWORK_CIDR=192.168.25.0/24
+export PRIVATE_NETWORK_CIDR=192.168.100.0/24
+export PUBLIC_NET_START=192.168.25.10
+export PUBLIC_NET_END=192.168.24.254
+export DNS_SERVER=192.168.25.1</pre></div>
+<p>手順を実施すると、 <code>ssh cirros@&lt;FLOATING_IP&gt;</code> にアクセスできます。</p></section>
+<section class="doc-section level-1"><h2 id="swiftなどのコマンド実行に必要な環境変数">swiftなどのコマンド実行に必要な環境変数</h2><p>この環境でSwiftコマンドなどを実行すると、以下のエラーが発生します。</p>
+<div class="listing-block"><pre>$ swift list
+Auth version 1.0 requires ST_AUTH, ST_USER, and ST_KEY environment variables
+to be set or overridden with -A, -U, or -K.
+
+Auth version 2.0 requires OS_AUTH_URL, OS_USERNAME, OS_PASSWORD, and
+OS_TENANT_NAME OS_TENANT_ID to be set or overridden with --os-auth-url,
+--os-username, --os-password, --os-tenant-name or os-tenant-id. Note:
+adding "-V 2" is necessary for this.</pre></div>
+<p><code>os-auth-url</code> などを環境変数かオプションで設定する必要がありますが、この値は、インストール時に作成されている <code>standalone-ansible-xxxxxxxx/Standalone/scale_tasks.yaml</code> にありました。</p>
+<div class="listing-block"><pre>    OS_AUTH_TYPE: password
+    OS_AUTH_URL: http://192.168.25.2:5000/v3
+    OS_IDENTITY_API_VERSION: 3
+    OS_PASSWORD: PASSWORDEXAMPLE
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_PROJECT_NAME: admin
+    OS_USERNAME: admin
+    OS_USER_DOMAIN_NAME: Default</pre></div></section>
+        
+      </section>
+
+      <footer class="page__meta">
+      </footer>
+
+      
+
+      
+  
+
+  
+    
+    
+    
+  
+
+  
+    
+      
+      
+
+
+  
+
+  
+    
+    
+    
+  
+
+  
+    
+    
+    
+  
+
+  
+
+
+
+  <nav class="pagination">
+    
+      <a href="/ja/product/deploy_3scale_on_crc/" class="pagination--pager" title="3scaleをCRCにデプロイ
+">Previous</a>
+    
+    
+      <a href="" class="pagination--pager" title="
+">Next</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Takayuki Konishi. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a>, <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a> &amp; <a href="https://asciidoctor.org/" rel="nofollow">AsciiDoc</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+<script>
+  twemoji.parse(document.getElementById("langage-selector"));
+</script>
+
+
+
+  </body>
+</html>
+

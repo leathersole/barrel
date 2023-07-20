@@ -1,0 +1,626 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Deploying 3scale to OpenShift Local | Rolling In The Barrel</title>
+<meta name="description" content="IntroductionThis document will walk you through the process of installing Red Hat 3scale API Management, an API management product, on OpenShift Local, an OpenShift environment running on desktops and laptops.">
+
+
+  <meta name="author" content="Takayuki Konishi">
+  
+  <meta property="article:author" content="Takayuki Konishi">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Rolling In The Barrel">
+<meta property="og:title" content="Deploying 3scale to OpenShift Local">
+<meta property="og:url" content="/en/product/deploy_3scale_on_crc/">
+
+
+  <meta property="og:description" content="IntroductionThis document will walk you through the process of installing Red Hat 3scale API Management, an API management product, on OpenShift Local, an OpenShift environment running on desktops and laptops.">
+
+
+
+
+
+  <meta name="twitter:site" content="@leather_sole">
+  <meta name="twitter:title" content="Deploying 3scale to OpenShift Local">
+  <meta name="twitter:description" content="IntroductionThis document will walk you through the process of installing Red Hat 3scale API Management, an API management product, on OpenShift Local, an OpenShift environment running on desktops and laptops.">
+  <meta name="twitter:url" content="/en/product/deploy_3scale_on_crc/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2020-07-05T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2023-07-18T15:38:24+09:00">
+
+
+
+
+<link rel="canonical" href="/en/product/deploy_3scale_on_crc/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Takayuki Konishi",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Rolling In The Barrel Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="stylesheet" href="/assets/css/custom.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese" rel="stylesheet">
+<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
+
+<!-- alternate links -->
+
+
+
+  <link rel="alternate" hreflang="en" href="/en/product/deploy_3scale_on_crc/" />
+
+  <link rel="alternate" hreflang="ja" href="/ja/product/deploy_3scale_on_crc/" />
+
+
+
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        
+          <a class="site-title" href="/">
+        
+          Rolling In The Barrel
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        
+<div class="lang" id="langage-selector">
+        
+        
+        
+        
+        <a hreflang="en" href="/en/product/deploy_3scale_on_crc/" class="en" title="Open the English translation of this page">&#x1f1fa;&#x1f1f8;</a>
+        
+        
+        
+        <a hreflang="ja" href="/ja/product/deploy_3scale_on_crc/" class="ja" title="日本語版を開く">&#x1f1ef;&#x1f1f5;</a>
+        
+        
+        
+</div>
+
+
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#en" itemprop="item"><span itemprop="name">En</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#product" itemprop="item"><span itemprop="name">Product</span></a>
+          <meta itemprop="position" content="3" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Deploying 3scale to OpenShift Local</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/photo.jpg" alt="Takayuki Konishi" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Takayuki Konishi</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Technical support engineer, sean-nos dancer</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Japan</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+            <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Deploying 3scale to OpenShift Local">
+    <meta itemprop="description" content="IntroductionThis document will walk you through the process of installing Red Hat 3scale API Management, an API management product, on OpenShift Local, an OpenShift environment running on desktops and laptops.">
+    <meta itemprop="datePublished" content="2020-07-05T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2023-07-18T15:38:24+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Deploying 3scale to OpenShift Local
+</h1>
+          
+          <div class="page__meta">
+            
+            
+
+  <p class="page__date"><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Published: <time datetime="2020-07-05T00:00:00+09:00">2020-07-05</time>
+    
+      Updated: <time datetime="2023-07-18">2023-07-18</time>
+        
+  </p>
+
+
+            
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#3scale" class="page__taxonomy-item" rel="tag">3scale</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#crc" class="page__taxonomy-item" rel="tag">crc</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#openshift-local" class="page__taxonomy-item" rel="tag">openshift_local</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#openshift" class="page__taxonomy-item" rel="tag">openshift</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#en" class="page__taxonomy-item" rel="tag">en</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#product" class="page__taxonomy-item" rel="tag">product</a>
+    
+    </span>
+  </p>
+
+
+          </div>
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> Index</h4></header>
+              <ul class="toc__menu"><li><a href="#introduction">Introduction</a></li><li><a href="#prerequisites">Prerequisites</a><ul><li><a href="#system-requirements">System requirements</a></li><li><a href="#accounts">Accounts</a></li></ul></li><li><a href="#my-tested-environment">My tested environment</a></li><li><a href="#installation-procedure">Installation procedure</a></li><li><a href="#troubleshooting">Troubleshooting</a><ul><li><a href="#operatorhub-page-shows-no-operatorhub-items-found">OperatorHub page shows "No OperatorHub Items Found"</a></li><li><a href="#3scale-operator-is-running-but-no-pods-are-rolled-out">3scale Operator is running, but no pods are rolled out.</a></li><li><a href="#cannot-start-openshift-local">Cannot start OpenShift Local</a></li><li><a href="#how-to-setup-previous-ocp-versions">How to setup previous OCP versions</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <section class="doc-section level-1"><h2 id="introduction">Introduction</h2><p>This document will walk you through the process of installing <a href="https://www.redhat.com/ja/technologies/jboss-middleware/3scale">Red Hat 3scale API Management</a>, an API management product, on <a href="https://developers.redhat.com/products/openshift-local/overview">OpenShift Local</a>, an OpenShift environment running on desktops and laptops.</p></section>
+<section class="doc-section level-1"><h2 id="prerequisites">Prerequisites</h2><section class="doc-section level-2"><h3 id="system-requirements">System requirements</h3><p>OpenShift Local requires the following system resources:</p>
+<div class="ulist"><ul><li>4 virtual CPUs (vCPUs)</li><li>9 GB of memory<ul><li>The procedure on this page recommends that you allocate at least 10GB of memory to the OpenShift Local virtual machine, preferably 16GB.</li></ul></li><li>35 GB of storage space</li></ul></div>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>For more requirements, refer to <a href="https://access.redhat.com/documentation/en-us/red_hat_openshift_local/2.23/html/getting_started_guide/installing#minimum_system_requirements">OpenShift Local - Minimum system requirements</a>.</p></aside></section>
+<section class="doc-section level-2"><h3 id="accounts">Accounts</h3><p>A Red Hat Developer account is required. For details on how to register, please refer to <a href="https://developers.redhat.com/">Red Hat Developer</a> page.</p></section></section>
+<section class="doc-section level-1"><h2 id="my-tested-environment">My tested environment</h2><div class="ulist"><ul><li><a href="https://getfedora.org/">Fedora 38</a></li><li>OpenShift Local 2.23.0</li><li>OpenShift 4.13.3</li><li>3scale 2.13</li></ul></div>
+<p>OpenShift Local is available for Windows, macOS, and Linux, so you can try it in other environments as well.</p></section>
+<section class="doc-section level-1"><h2 id="installation-procedure">Installation procedure</h2><div class="olist arabic"><ol class="arabic"><li>Download OpenShift Local and Pull Secret from <a href="https://console.redhat.com/openshift/create/local">this download page</a>.</li><li>Extract the OpenShift Local archive file, move to the extracted directory, then run this command.</li><li><p><code>$ ./crc setup</code></p><aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>If you have more memory available on your PC, I recommend increasing the memory allocation. By running <code>./crc config set memory 16384</code>, OpenShift Local will use 16GB memory.</p></aside>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>The command name comes from CodeReady Containers, the former product name of OpenShift Local.</p></aside></li><li><p><code>$ ./crc start -p /path/to/pull-secret</code><br>
+It will take quite a while, so please be patient. When the following message is output, the OpenShift Local has been started.</p><div class="listing-block"><pre class="rouge highlight"><code>Started the OpenShift cluster.
+
+The server is accessible via web console at:
+  https://console-openshift-console.apps-crc.testing
+
+Log in as administrator:
+  Username: kubeadmin
+  Password: &lt;password&gt;
+
+Log in as user:
+  Username: developer
+  Password: developer
+
+Use the 'oc' command line interface:
+  $ eval $(crc oc-env)
+  $ oc login -u developer https://api.crc.testing:6443</code></pre></div>
+<p>The login user, password, connection destination, etc. are printed in the startup message, so please note them.<br>
+After the OpenShift Local indicates that the startup is complete, you can access the OpenShift web console. However, in some cases, the startup process is still going on.</p></li><li><p>Enable <code>oc</code> command.</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span><span class="nb">eval</span> <span class="si">$(</span>./crc oc-env<span class="si">)</span></code></pre></div></li><li><p>Login to the OpenShift with this command.</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>oc login <span class="nt">-u</span> kubeadmin <span class="nt">-p</span> &lt;password&gt; https://api.crc.testing:6443</code></pre></div>
+<p>Replace <code>&lt;password&gt;</code> with the generated password.</p></li><li><p>Create a project (e.g. 3scale)</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>oc new-project 3scale</code></pre></div></li><li><p>Run <code>$ crc console</code> to open the OpenShift web console.</p><p><img src="/assets/images/operatorhub_marked.png" alt="OperatorHub"></p></li><li>Select Administrator view.</li><li>Open OperatorHub.</li><li>Search "3scale".</li><li>Click <code>Red Hat Integration - 3scale</code></li><li>Click <code>Install</code> button.</li><li><p>Select a project to install the operator, a 3scale version, enable/disable auto update. Click <code>Install</code> button.</p><p><img src="/assets/images/select_install_options.png" alt="Select Install Options"></p></li><li>Click the operator, click <code>APIManager</code> tab, then click <code>Create APIManager</code>.</li><li><p>Select <code>YAML view</code>, edit APIManager definition as following, then click <code>Create</code>.</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps.3scale.net/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">APIManager</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">apimanager-sample</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">3scale</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">wildcardDomain</span><span class="pi">:</span> <span class="s">apps-crc.testing</span>
+  <span class="na">resourceRequirementsEnabled</span><span class="pi">:</span> <span class="kc">false</span></code></pre></div></li><li><p>Flip to Developer view, open Topology page.</p><p><img src="/assets/images/flip_to_developer_view.png" alt="Flip to Developer view"></p></li><li>Once all the pods have been rolled out, access the 3scale admin portal.<ul><li>3scale admin portal: <a class="bare" href="https://3scale-admin.apps-crc.testing/">https://3scale-admin.apps-crc.testing/</a></li><li>Check <code>ADMIN_USER</code> and <code>ADMIN_PASSWORD</code> in the <code>system-seed</code> secret for your ID and password.<ul><li><a class="bare" href="https://console-openshift-console.apps-crc.testing/k8s/ns/3scale/secrets/system-seed">https://console-openshift-console.apps-crc.testing/k8s/ns/3scale/secrets/system-seed</a></li></ul></li><li>Other Routes<ul><li><a class="bare" href="https://console-openshift-console.apps-crc.testing/search/ns/3scale?kind=Route">https://console-openshift-console.apps-crc.testing/search/ns/3scale?kind=Route</a></li></ul></li></ul></li></ol></div></section>
+<section class="doc-section level-1"><h2 id="troubleshooting">Troubleshooting</h2><section class="doc-section level-2"><h3 id="operatorhub-page-shows-no-operatorhub-items-found">OperatorHub page shows "No OperatorHub Items Found"</h3><p>Wait for a while. The feature might not be ready yet.</p>
+<p>This document may help.<br>
+<a href="https://github.com/operator-framework/operator-marketplace/blob/master/docs/troubleshooting.md#no-packages-show-up-in-the-ui-no-operatorhub-items-found">No packages show up in the UI (No OperatorHub Items Found)</a></p></section>
+<section class="doc-section level-2"><h3 id="3scale-operator-is-running-but-no-pods-are-rolled-out">3scale Operator is running, but no pods are rolled out.</h3><div class="ulist"><ul><li>Confirm whether <code>threescale-registry-auth</code> secret is created with the correct values.</li></ul></div></section>
+<section class="doc-section level-2"><h3 id="cannot-start-openshift-local">Cannot start OpenShift Local</h3><p>Try these operations:</p>
+<div class="ulist"><ul><li><code>$ ./crc stop</code></li><li><code>$ ./crc delete</code></li><li>Remove the crc VM</li></ul></div>
+<p>After that, back to <code>crc setup</code>.</p></section>
+<section class="doc-section level-2"><h3 id="how-to-setup-previous-ocp-versions">How to setup previous OCP versions</h3><p>If you need to run previous OCP versions, you can download the corresponding OpenShift Local from here:<br>
+<a class="bare" href="https://mirror.openshift.com/pub/openshift-v4/clients/crc/">https://mirror.openshift.com/pub/openshift-v4/clients/crc/</a></p></section></section>
+        
+      </section>
+
+      <footer class="page__meta">
+      </footer>
+
+      
+
+      
+  
+    
+    
+    
+  
+
+  
+
+  
+
+  
+    
+    
+    
+  
+
+
+
+  
+    
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+      
+
+
+  <nav class="pagination">
+    
+      <a href="#" class="pagination--pager disabled">Previous</a>
+    
+    
+      <a href="/en/product/opentracing_on_3scale/" class="pagination--pager" title="OpenTracing on 3scale
+">Next</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Takayuki Konishi. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a>, <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a> &amp; <a href="https://asciidoctor.org/" rel="nofollow">AsciiDoc</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+<script>
+  twemoji.parse(document.getElementById("langage-selector"));
+</script>
+
+
+
+  </body>
+</html>
+

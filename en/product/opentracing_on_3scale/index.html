@@ -1,0 +1,636 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.3 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>OpenTracing on 3scale | Rolling In The Barrel</title>
+<meta name="description" content="IntroductionThis document will walk you through how to setup Jaeger, enable OpenTracing on APIcast and Echo-api, then confirm the integration on OpenShift 4.x.">
+
+
+  <meta name="author" content="Takayuki Konishi">
+  
+  <meta property="article:author" content="Takayuki Konishi">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Rolling In The Barrel">
+<meta property="og:title" content="OpenTracing on 3scale">
+<meta property="og:url" content="/en/product/opentracing_on_3scale/">
+
+
+  <meta property="og:description" content="IntroductionThis document will walk you through how to setup Jaeger, enable OpenTracing on APIcast and Echo-api, then confirm the integration on OpenShift 4.x.">
+
+
+
+
+
+  <meta name="twitter:site" content="@leather_sole">
+  <meta name="twitter:title" content="OpenTracing on 3scale">
+  <meta name="twitter:description" content="IntroductionThis document will walk you through how to setup Jaeger, enable OpenTracing on APIcast and Echo-api, then confirm the integration on OpenShift 4.x.">
+  <meta name="twitter:url" content="/en/product/opentracing_on_3scale/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2021-04-01T00:00:00+09:00">
+
+
+
+
+
+
+<link rel="canonical" href="/en/product/opentracing_on_3scale/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Takayuki Konishi",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Rolling In The Barrel Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+<link rel="stylesheet" href="/assets/css/custom.css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese" rel="stylesheet">
+<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
+
+<!-- alternate links -->
+
+
+
+  <link rel="alternate" hreflang="en" href="/en/product/opentracing_on_3scale/" />
+
+
+
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        
+          <a class="site-title" href="/">
+        
+          Rolling In The Barrel
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        
+<div class="lang" id="langage-selector">
+        
+        
+        
+        
+        <a hreflang="en" href="/en/product/opentracing_on_3scale/" class="en" title="Open the English translation of this page">&#x1f1fa;&#x1f1f8;</a>
+        
+        
+        
+</div>
+
+
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#en" itemprop="item"><span itemprop="name">En</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#product" itemprop="item"><span itemprop="name">Product</span></a>
+          <meta itemprop="position" content="3" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">OpenTracing on 3scale</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/photo.jpg" alt="Takayuki Konishi" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Takayuki Konishi</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Technical support engineer, sean-nos dancer</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Japan</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+            <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="OpenTracing on 3scale">
+    <meta itemprop="description" content="IntroductionThis document will walk you through how to setup Jaeger, enable OpenTracing on APIcast and Echo-api, then confirm the integration on OpenShift 4.x.">
+    <meta itemprop="datePublished" content="2021-04-01T00:00:00+09:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">OpenTracing on 3scale
+</h1>
+          
+          <div class="page__meta">
+            
+            
+
+  <p class="page__date"><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Published: <time datetime="2021-04-01T00:00:00+09:00">2021-04-01</time>
+        
+  </p>
+
+
+            
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#3scale" class="page__taxonomy-item" rel="tag">3scale</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#jaeger" class="page__taxonomy-item" rel="tag">jaeger</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#openshift" class="page__taxonomy-item" rel="tag">openshift</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#opentracing" class="page__taxonomy-item" rel="tag">opentracing</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories:
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#en" class="page__taxonomy-item" rel="tag">en</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#product" class="page__taxonomy-item" rel="tag">product</a>
+    
+    </span>
+  </p>
+
+
+          </div>
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> Index</h4></header>
+              <ul class="toc__menu"><li><a href="#introduction">Introduction</a></li><li><a href="#prerequisites">Prerequisites</a><ul><li><a href="#software-requirements">Software requirements</a></li></ul></li><li><a href="#my-tested-environment">My tested environment</a></li><li><a href="#setup-procedure">Setup procedure</a><ul><li><a href="#install-red-hat-openshift-jaeger-operator">Install Red Hat OpenShift Jaeger operator</a></li><li><a href="#create-jaeger">Create Jaeger</a></li><li><a href="#configure-apicast">Configure APIcast</a></li><li><a href="#setup-echo-api">Setup echo-api</a></li><li><a href="#configure-a-product">Configure a product</a></li><li><a href="#test-the-integration">Test the integration</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <section class="doc-section level-1"><h2 id="introduction">Introduction</h2><p>This document will walk you through how to setup <a href="https://www.jaegertracing.io/">Jaeger</a>, enable OpenTracing on <a href="https://github.com/3scale/APIcast">APIcast</a> and <a href="https://github.com/3scale/echo-api">Echo-api</a>, then confirm the integration on <a href="https://www.openshift.com/">OpenShift 4.x</a>.</p></section>
+<section class="doc-section level-1"><h2 id="prerequisites">Prerequisites</h2><section class="doc-section level-2"><h3 id="software-requirements">Software requirements</h3><div class="ulist"><ul><li><a href="https://www.openshift.com/products/container-platform">Red Hat OpenShift Container Platform</a> 4.6</li><li><a href="https://www.redhat.com/en/technologies/jboss-middleware/3scale">Red Hat 3scale API Management</a> 2.9</li></ul></div>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>This procedure would work on some previous versions but isn&#8217;t confirmed</p></aside></section></section>
+<section class="doc-section level-1"><h2 id="my-tested-environment">My tested environment</h2><div class="ulist"><ul><li><a href="https://getfedora.org/">Fedora 32</a></li><li><a href="https://developers.redhat.com/products/codeready-containers/overview">Red Hat CodeReady Containers(CRC)</a> 1.24.0</li><li><a href="https://www.openshift.com/products/container-platform">OpenShift</a> 4.7.0</li><li><a href="https://www.redhat.com/en/technologies/jboss-middleware/3scale">3scale</a> 2.9</li></ul></div>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>CRC is available for Windows, macOS, and Linux, so you can try it in other environments as well.</p></aside>
+<aside class="admonition-block note notice" role="note"><h6 class="block-title label-only"><span class="title-label">Note: </span></h6><p>3scale 2.9 isn&#8217;t supported on OpenShift 4.7. I&#8217;ll test this steps with 3scale 2.10 after released.</p></aside></section>
+<section class="doc-section level-1"><h2 id="setup-procedure">Setup procedure</h2><section class="doc-section level-2"><h3 id="install-red-hat-openshift-jaeger-operator">Install Red Hat OpenShift Jaeger operator</h3><div class="olist arabic"><ol class="arabic"><li><p>Open OperatorHub.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_00_operatorhub.png" alt="OperatorHub"></p></li><li><p>Search <code>jaeger</code>, then click <code>Red Hat OpenShift Jaeger</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_01_operatorhub.png" alt="OperatorHub"></p></li><li><p>Click <code>Install</code></p><p><img src="/assets/images/20210401_opentracing_on_3scale_02_1_jaeger_install.png" alt="Jaeger Operator Installation"></p></li><li><p>Click <code>Install</code> again.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_02_2_jaeger_install.png" alt="Jaeger Operator Installation"></p></li><li><p>Wait until the installation complete.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_02_3_jaeger_install.png" alt="Jaeger Operator Installation"></p></li></ol></div></section>
+<section class="doc-section level-2"><h3 id="create-jaeger">Create Jaeger</h3><div class="olist arabic"><ol class="arabic"><li><p>Open Installed Operators page, make sure the project is your 3scale project. Then click <code>Jaeger</code> link.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_03_installed_operators.png" alt="Jaeger Operator Installation"></p></li><li><p>Click <code>Create Jaeger</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_04_operator_details.png" alt="Jaeger Operator Installation"></p></li><li><p>Click <code>Create</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_05_create_jaeger.png" alt="Jaeger Operator Installation"></p></li><li><p><code>jaeger-all-in-one-in-memory</code> will be created.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_06_created_jaeger.png" alt="Jaeger Operator Installation"></p></li><li><p>Search <code>jaeger-all-in-one-in-memory</code> route, then open the location.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_08_routes.png" alt="Jaeger Operator Installation"></p></li><li><p>Click <code>Login with OpenShift</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_09_1_login_Jeager.png" alt="Jaeger Operator Installation"></p></li><li><p>Login to OpenShift as a user.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_09_2_login_Jeager.png" alt="Jaeger Operator Installation"></p></li><li><p>Click <code>Allow selected permissions</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_09_3_login_Jeager.png" alt="Jaeger Operator Installation"></p></li><li><p>Now you will see Jaeger UI.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_10_jaeger_ui.png" alt="Jaeger Operator Installation"></p></li><li><p>You can see 4 Jaeger services in the project.</p><div class="listing-block"><pre>$ oc get svc|grep '\(jaeger\|NAME\)'
+NAME                                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                                  AGE
+jaeger-all-in-one-inmemory-agent                ClusterIP   None           &lt;none&gt;        5775/UDP,5778/TCP,6831/UDP,6832/UDP      5d
+jaeger-all-in-one-inmemory-collector            ClusterIP   10.217.5.218   &lt;none&gt;        9411/TCP,14250/TCP,14267/TCP,14268/TCP   5d
+jaeger-all-in-one-inmemory-collector-headless   ClusterIP   None           &lt;none&gt;        9411/TCP,14250/TCP,14267/TCP,14268/TCP   5d
+jaeger-all-in-one-inmemory-query                ClusterIP   10.217.4.66    &lt;none&gt;        443/TCP                                  5d</pre></div></li></ol></div></section>
+<section class="doc-section level-2"><h3 id="configure-apicast">Configure APIcast</h3><p>Reference: <a href="https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.9/html/administering_the_api_gateway/operating-apicast#configuring_apicast_with_opentracing">Configuring APIcast with OpenTracing</a></p>
+<div class="olist arabic"><ol class="arabic"><li><p>Configure <code>jaeger_config.json</code> locally.</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"service_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apicast"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"disabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"sampler"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"const"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"param"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"reporter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"queueSize"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"bufferFlushInterval"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"logSpans"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"localAgentHostPort"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jaeger-all-in-one-inmemory-agent:6831"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"jaegerDebugHeader"</span><span class="p">:</span><span class="w"> </span><span class="s2">"debug-id"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"jaegerBaggageHeader"</span><span class="p">:</span><span class="w"> </span><span class="s2">"baggage"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"TraceContextHeaderName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uber-trace-id"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"traceBaggageHeaderPrefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"testctx-"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"baggage_restrictions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"denyBaggageOnInitializationFailure"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"hostPort"</span><span class="p">:</span><span class="w"> </span><span class="s2">"127.0.0.1:5778"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"refreshInterval"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span></code></pre></div></li><li><p>Register jaeger_config.json as a ConfigMap</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>oc create configmap jaeger-config <span class="nt">--from-file</span><span class="o">=</span>jaeger_config.json</code></pre></div></li><li><p>Mount the file on apicast-production</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>oc <span class="nb">set </span>volume dc/apicast-production <span class="nt">--add</span> <span class="nt">--overwrite</span> <span class="nt">--name</span><span class="o">=</span>jaeger-config <span class="nt">--mount-path</span><span class="o">=</span>/opt/app-root/src/conf.d/opentracing/jaeger_config.json <span class="nt">--sub-path</span><span class="o">=</span>jaeger_config.json <span class="nt">--source</span><span class="o">=</span><span class="s1">'{"configMap":{"name":"jaeger-config","items":[{"key":"jaeger_config.json","path":"jaeger_config.json"}]}}'</span></code></pre></div></li><li><p>Add <code>OPENTRACING_TRACER</code> and <code>OPENTRACING_CONFIG</code> environment variables in apicast-production deploymentconfig.</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>oc <span class="nb">set env </span>dc/apicast <span class="nv">OPENTRACING_TRACER</span><span class="o">=</span>jaeger <span class="nv">OPENTRACING_CONFIG</span><span class="o">=</span>/opt/app-root/src/conf.d/opentracing/jaeger_config.json</code></pre></div></li><li>After deployed apicast-production, call a production base url of a product</li><li><p>Open Jaeger UI, select <code>apicast</code> service then click <code>Find Traces</code>.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_11_find_apicast_traces.png" alt="Find APIcast tracing"></p></li><li><p>Traces are listed.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_12_apicast_traces.png" alt="APIcast tracing"></p></li></ol></div></section>
+<section class="doc-section level-2"><h3 id="setup-echo-api">Setup echo-api</h3><div class="olist arabic"><ol class="arabic"><li><p>Install echo-api</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>oc new-app <span class="nt">-f</span> https://raw.githubusercontent.com/3scale/echo-api/master/contrib/openshift/echo-api-template.yml <span class="nt">--param</span> <span class="nv">ECHOAPI_HOST</span><span class="o">=</span>echo-api.apps-crc.testing</code></pre></div></li><li><p>Configure echo-api</p><div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>oc <span class="nb">set env </span>dc/echo-api <span class="nv">OPENTRACING_TRACER</span><span class="o">=</span>jaeger <span class="nv">JAEGER_AGENT_HOST</span><span class="o">=</span>jaeger-all-in-one-inmemory-agent <span class="nv">JAEGER_AGENT_PORT</span><span class="o">=</span><span class="s2">"6831"</span></code></pre></div></li><li><p>Open Jaeger UI, select <code>echo-api</code> service then click <code>Find Traces</code>. Traces are listed.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_13_echoapi_traces.png" alt="Echo-api tracing"></p></li></ol></div></section>
+<section class="doc-section level-2"><h3 id="configure-a-product">Configure a product</h3><div class="olist arabic"><ol class="arabic"><li><p>Configure the echo-api route as a backend</p><p><img src="/assets/images/20210401_opentracing_on_3scale_14_echoapi_backend.png" alt="Configure echo-api backend"></p></li><li><p>Configure the the backend to a product</p><p><img src="/assets/images/20210401_opentracing_on_3scale_15_configure_product.png" alt="Configure product"></p></li><li>Promote the configuration to the staging and production environment</li></ol></div></section>
+<section class="doc-section level-2"><h3 id="test-the-integration">Test the integration</h3><div class="olist arabic"><ol class="arabic"><li>Send a request to the production public base url</li><li><p>Confirm whether the response returned from the echo-api</p><p>example:</p>
+<div class="listing-block"><pre class="rouge highlight"><code data-lang="shell"><span class="nv">$ </span>curl <span class="s2">"https://api-3scale-apicast-production.apps-crc.testing:443/?user_key=b382b63a376dc1d41de338509066e2d3"</span> <span class="nt">-k</span></code></pre></div>
+<div class="listing-block"><pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GET"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"args"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_key=b382b63a376dc1d41de338509066e2d3"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"HTTP_VERSION"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HTTP/1.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_REAL_IP"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.217.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_3SCALE_PROXY_SECRET_TOKEN"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Shared_secret_sent_from_proxy_to_API_backend_5817cd301754f6b2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_USER_AGENT"</span><span class="p">:</span><span class="w"> </span><span class="s2">"curl/7.69.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_ACCEPT"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*/*"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_FORWARDED_HOST"</span><span class="p">:</span><span class="w"> </span><span class="s2">"api-3scale-apicast-production.apps-crc.testing, echo-api.apps-crc.testing"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_FORWARDED_PORT"</span><span class="p">:</span><span class="w"> </span><span class="s2">"443, 80"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_FORWARDED_PROTO"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https, http"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_FORWARDED"</span><span class="p">:</span><span class="w"> </span><span class="s2">"for=192.168.130.1;host=api-3scale-apicast-production.apps-crc.testing;proto=https, for=10.217.0.117;host=echo-api.apps-crc.testing;proto=http"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_X_FORWARDED_FOR"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.130.1, 10.217.0.117"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_UBER_TRACE_ID"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ebd6331bd080b480:b7cca0910ca55d3d:ebd6331bd080b480:1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"HTTP_HOST"</span><span class="p">:</span><span class="w"> </span><span class="s2">"echo-api.apps-crc.testing"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4029588a-77de-44b8-a80a-388e5506aa50"</span><span class="w">
+</span><span class="p">}</span></code></pre></div></li><li><p>Open Jaeger UI, select <code>apicast</code> service then click <code>Find Traces</code>. Traces are listed.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_16_apicast_traces.png" alt="APIcast traces"></p></li><li><p>Click a trace that contais <code>apicast</code> and <code>echo-api</code>. APIcast and Echo-api is included in one trace.</p><p><img src="/assets/images/20210401_opentracing_on_3scale_17_trace_detail.png" alt="Trace detail"></p></li></ol></div></section></section>
+        
+      </section>
+
+      <footer class="page__meta">
+      </footer>
+
+      
+
+      
+  
+    
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+      
+
+
+  
+    
+    
+    
+  
+
+  
+
+  
+
+  
+    
+    
+    
+  
+
+
+
+  <nav class="pagination">
+    
+      <a href="/en/product/deploy_3scale_on_crc/" class="pagination--pager" title="Deploying 3scale to OpenShift Local
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/leather_sole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/leathersole" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Takayuki Konishi. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a>, <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a> &amp; <a href="https://asciidoctor.org/" rel="nofollow">AsciiDoc</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+<script>
+  twemoji.parse(document.getElementById("langage-selector"));
+</script>
+
+
+
+  </body>
+</html>
+
